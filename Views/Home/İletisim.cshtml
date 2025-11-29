@@ -1,0 +1,130 @@
+﻿
+@{
+    ViewBag.Title = "İletişim";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<!-- Başlık ve Breadcrumb -->
+<div class="d-sm-flex align-items-center justify-content-between mb-4">
+    <h1 class="h3 mb-0 text-gray-800">Bize Ulaşın</h1>
+    <ol class="breadcrumb bg-light m-0 p-2 rounded">
+        <li class="breadcrumb-item"><a href="~/Home/Index">Anasayfa</a></li>
+        <li class="breadcrumb-item active" aria-current="page">İletişim</li>
+    </ol>
+</div>
+
+<div class="row">
+
+    <!-- SOL KOLON: İletişim Bilgileri & Harita -->
+    <div class="col-lg-5 mb-4">
+
+        <!-- Bilgi Kartı -->
+        <div class="card shadow mb-4 h-100">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">İletişim Bilgileri</h6>
+            </div>
+            <div class="card-body">
+                <div class="mb-4">
+                    <div class="d-flex align-items-start">
+                        <div class="btn btn-primary btn-circle mr-3">
+                            <i class="fas fa-map-marker-alt"></i>
+                        </div>
+                        <div>
+                            <h5 class="font-weight-bold text-dark">Adresimiz</h5>
+                            <p class="text-gray-600">
+                                Teknoloji Vadisi, B Blok No: 14<br>
+                                Levent / İSTANBUL
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mb-4">
+                    <div class="d-flex align-items-start">
+                        <div class="btn btn-success btn-circle mr-3">
+                            <i class="fas fa-phone"></i>
+                        </div>
+                        <div>
+                            <h5 class="font-weight-bold text-dark">Telefon</h5>
+                            <p class="text-gray-600">
+                                Müşteri Hizmetleri: <br>
+                                <a href="tel:08501234567" class="text-decoration-none font-weight-bold text-dark">0850 123 45 67</a>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mb-4">
+                    <div class="d-flex align-items-start">
+                        <div class="btn btn-info btn-circle mr-3">
+                            <i class="fas fa-envelope"></i>
+                        </div>
+                        <div>
+                            <h5 class="font-weight-bold text-dark">E-Posta</h5>
+                            <p class="text-gray-600">
+                                7/24 Destek: <br>
+                                <a href="mailto:info@dorukshop.com" class="text-decoration-none text-dark">info@dorukshop.com</a>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Google Harita (Embed) -->
+                <div class="map-container rounded overflow-hidden border mt-3">
+                    <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3008.154321904616!2d29.01030931564734!3d41.06485197929516!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x14cab66707626277%3A0x33072e875637a639!2sLevent%2C%20Be%C5%9Fikta%C5%9F%2F%C4%B0stanbul!5e0!3m2!1str!2str!4v1625667000000!5m2!1str!2str"
+                            width="100%" height="200" style="border:0;" allowfullscreen="" loading="lazy"></iframe>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- SAĞ KOLON: İletişim Formu -->
+    <div class="col-lg-7 mb-4">
+        <div class="card shadow h-100">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">Bize Yazın</h6>
+            </div>
+            <div class="card-body">
+                <p class="mb-4 text-gray-600">Öneri, şikayet veya iş birliği talepleriniz için aşağıdaki formu doldurabilirsiniz. Ekibimiz en geç 24 saat içinde dönüş yapacaktır.</p>
+
+                <form>
+                    <div class="form-row">
+                        <div class="form-group col-md-6">
+                            <label class="text-dark font-weight-bold">Adınız Soyadınız</label>
+                            <input type="text" class="form-control" placeholder="Örn: Doruk Yılmaz">
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label class="text-dark font-weight-bold">E-Posta Adresiniz</label>
+                            <input type="email" class="form-control" placeholder="mail@ornek.com">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="text-dark font-weight-bold">Konu</label>
+                        <select class="form-control">
+                            <option>Sipariş Durumu Hakkında</option>
+                            <option>Teknik Destek</option>
+                            <option>İade ve Değişim</option>
+                            <option>Diğer</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="text-dark font-weight-bold">Mesajınız</label>
+                        <textarea class="form-control" rows="5" placeholder="Size nasıl yardımcı olabiliriz?"></textarea>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary btn-icon-split btn-lg" onclick="alert('Mesajınız başarıyla gönderildi! En kısa sürede dönüş yapacağız.')">
+                        <span class="icon text-white-50">
+                            <i class="fas fa-paper-plane"></i>
+                        </span>
+                        <span class="text">Gönder</span>
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+</div>
+

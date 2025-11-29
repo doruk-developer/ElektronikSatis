@@ -1,0 +1,249 @@
+﻿
+@{
+    ViewBag.Title = "Siparişi Tamamla";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h1 class="h3 mb-4 text-gray-800">Ödeme ve Onay</h1>
+
+<div class="row">
+
+    <!-- SOL KOLON: Adres ve Ödeme -->
+    <div class="col-lg-8">
+
+        <!-- 1. ADRES BİLGİLERİ -->
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">Teslimat Adresi</h6>
+            </div>
+            <div class="card-body">
+                <form>
+                    <div class="form-row">
+                        <div class="form-group col-md-6">
+                            <label>Ad Soyad</label>
+                            <input type="text" class="form-control" value="Doruk Yılmaz">
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label>Telefon</label>
+                            <input type="text" class="form-control" value="0555 123 45 67">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Adres</label>
+                        <textarea class="form-control" rows="2">Teknoloji Vadisi, B Blok No:14 Levent / İSTANBUL</textarea>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- 2. KREDİ KARTI BİLGİLERİ -->
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">Kart Bilgileri</h6>
+            </div>
+            <div class="card-body">
+                <form id="paymentForm">
+
+                    <!-- Kart Sahibi -->
+                    <div class="form-group position-relative">
+                        <label>Kart Üzerindeki İsim</label>
+                        <input type="text" class="form-control card-input" id="cardName" placeholder="Ad Soyad" onkeyup="validatePayment()">
+                        <i class="fas fa-check-circle text-success validation-icon" id="icon-name"></i>
+                    </div>
+
+                    <!-- Kart Numarası -->
+                    <div class="form-group position-relative">
+                        <label>Kart Numarası (16 Hane)</label>
+                        <input type="text" class="form-control card-input" id="cardNumber" placeholder="0000 0000 0000 0000" maxlength="19" onkeyup="formatCardNumber(this); validatePayment()">
+                        <i class="fas fa-check-circle text-success validation-icon" id="icon-number"></i>
+                    </div>
+
+                    <div class="form-row">
+                        <!-- Son Kullanma Tarihi -->
+                        <div class="form-group col-md-6 position-relative">
+                            <label>Son Kul. Tarihi (AA/YY)</label>
+                            <input type="text" class="form-control card-input" id="cardDate" placeholder="MM/YY" maxlength="5" onkeyup="formatDate(this); validatePayment()">
+                            <i class="fas fa-check-circle text-success validation-icon" id="icon-date"></i>
+                        </div>
+
+                        <!-- CVV -->
+                        <div class="form-group col-md-6 position-relative">
+                            <label>CVV (3 Hane)</label>
+                            <input type="text" class="form-control card-input" id="cardCvv" placeholder="123" maxlength="3" onkeyup="validatePayment()">
+                            <i class="fas fa-check-circle text-success validation-icon" id="icon-cvv"></i>
+                        </div>
+                    </div>
+
+                </form>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- SAĞ KOLON: Özet ve Buton -->
+    <div class="col-lg-4">
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">Sipariş Özeti</h6>
+            </div>
+            <div class="card-body">
+                <div class="d-flex justify-content-between mb-3">
+                    <span>Toplam Tutar:</span>
+                    <span class="font-weight-bold" id="checkoutTotal">0 TL</span>
+                </div>
+                <div class="alert alert-warning small">
+                    <i class="fas fa-info-circle"></i> Ödeme butonunun aktif olması için kart bilgilerini eksiksiz giriniz.
+                </div>
+
+                <!-- SİPARİŞİ TAMAMLA BUTONU (Başlangıçta Disabled) -->
+                <button id="btnCompleteOrder" class="btn btn-success btn-block btn-lg" disabled onclick="completeOrder()">
+                    <i class="fas fa-lock"></i> Siparişi Tamamla
+                </button>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<!-- BAŞARI MESAJI (Overlay - Gizli) -->
+<div id="successOverlay" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); z-index:9999; align-items:center; justify-content:center; flex-direction:column;">
+    <div class="text-center">
+        <i class="fas fa-check-circle text-success" style="font-size: 100px; animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);"></i>
+        <h2 class="text-white mt-4 font-weight-bold">Siparişiniz Başarıyla Alındı!</h2>
+        <p class="text-white-50">Geçmiş siparişlerim sayfasına yönlendiriliyorsunuz...</p>
+    </div>
+</div>
+
+<!-- CSS -->
+<style>
+    .validation-icon {
+        position: absolute;
+        right: 15px;
+        top: 45px; /* Inputun içine denk getirmek için */
+        font-size: 1.2rem;
+        display: none; /* Başlangıçta gizli */
+    }
+    @@keyframes popIn {
+        0% { transform: scale(0); opacity: 0; }
+        100% { transform: scale(1); opacity: 1; }
+    }
+</style>
+
+<!-- JAVASCRIPT -->
+<script>
+    // Sayfa açılınca tutarı göster
+    document.addEventListener("DOMContentLoaded", function() {
+        calculateTotal();
+    });
+
+    function calculateTotal() {
+        var cart = JSON.parse(localStorage.getItem('myShoppingCart')) || [];
+        var total = 0;
+        cart.forEach(item => total += item.price * item.quantity);
+        document.getElementById('checkoutTotal').innerText = formatMoney(total) + " TL";
+    }
+
+    // --- 1. KART GİRİŞ FORMATLARI ---
+    function formatCardNumber(input) {
+        // Boşlukları sil, 4'lü gruplara ayır
+        let val = input.value.replace(/\D/g, '');
+        let newVal = '';
+        for(let i=0; i<val.length; i++) {
+            if(i > 0 && i%4 == 0) newVal += ' ';
+            newVal += val[i];
+        }
+        input.value = newVal;
+    }
+
+    function formatDate(input) {
+        // MM/YY formatı
+        let val = input.value.replace(/\D/g, '');
+        if(val.length > 2) {
+            input.value = val.substring(0,2) + '/' + val.substring(2,4);
+        } else {
+            input.value = val;
+        }
+    }
+
+    // --- 2. DOĞRULAMA (Yeşil Tikler & Buton Aktifliği) ---
+    function validatePayment() {
+        let isValid = true;
+
+        // İsim Kontrolü (En az 3 harf)
+        if(document.getElementById('cardName').value.length > 3) {
+            document.getElementById('icon-name').style.display = 'block';
+        } else {
+            document.getElementById('icon-name').style.display = 'none';
+            isValid = false;
+        }
+
+        // Kart No Kontrolü (16 hane + 3 boşluk = 19 karakter)
+        if(document.getElementById('cardNumber').value.length === 19) {
+            document.getElementById('icon-number').style.display = 'block';
+        } else {
+            document.getElementById('icon-number').style.display = 'none';
+            isValid = false;
+        }
+
+        // Tarih Kontrolü (5 karakter)
+        if(document.getElementById('cardDate').value.length === 5) {
+            document.getElementById('icon-date').style.display = 'block';
+        } else {
+            document.getElementById('icon-date').style.display = 'none';
+            isValid = false;
+        }
+
+        // CVV Kontrolü (3 hane)
+        if(document.getElementById('cardCvv').value.length === 3) {
+            document.getElementById('icon-cvv').style.display = 'block';
+        } else {
+            document.getElementById('icon-cvv').style.display = 'none';
+            isValid = false;
+        }
+
+        // Buton Durumu
+        document.getElementById('btnCompleteOrder').disabled = !isValid;
+    }
+
+    // --- 3. SİPARİŞİ TAMAMLAMA VE KAYDETME ---
+    function completeOrder() {
+        // A) Sepetteki ürünleri al
+        var cart = JSON.parse(localStorage.getItem('myShoppingCart')) || [];
+
+        if(cart.length === 0) return;
+
+        // B) Sipariş objesi oluştur
+        var newOrder = {
+            orderNo: Math.floor(Math.random() * 1000000), // Rastgele sipariş no
+            date: new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString(),
+            items: cart,
+            total: document.getElementById('checkoutTotal').innerText,
+            status: "Hazırlanıyor"
+        };
+
+        // C) Geçmiş siparişlere ekle
+        var pastOrders = JSON.parse(localStorage.getItem('myPastOrders')) || [];
+        pastOrders.unshift(newOrder); // En başa ekle
+        localStorage.setItem('myPastOrders', JSON.stringify(pastOrders));
+
+        // D) Sepeti Boşalt
+        localStorage.removeItem('myShoppingCart');
+
+        // Layout sayacını sıfırla (Global fonksiyona erişim varsa)
+        if(window.calculateCartTotal) window.calculateCartTotal(); // Opsiyonel
+
+        // E) Şov Yap (Overlay Göster)
+        var overlay = document.getElementById('successOverlay');
+        overlay.style.display = 'flex';
+
+        // F) 3 Saniye sonra yönlendir
+        setTimeout(function() {
+            window.location.href = '@Url.Action("Gecmis_Siparislerim", "Home")';
+        }, 3000);
+    }
+
+    function formatMoney(amount) {
+        return amount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+    }
+</script>
+

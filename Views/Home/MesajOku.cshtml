@@ -1,0 +1,54 @@
+﻿
+@model ElektronikSatisProje.Models.Mesaj
+
+@{
+    ViewBag.Title = "Mesaj Oku";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container-fluid">
+
+    <!-- Geri Dön Butonu -->
+    <a href="~/Home/Mesajlarim" class="btn btn-link pl-0 mb-3 text-decoration-none">
+        <i class="fas fa-arrow-left"></i> Gelen Kutusuna Dön
+    </a>
+
+    <!-- Mesaj Kartı -->
+    <div class="card shadow mb-4">
+        <div class="card-header py-3 d-flex align-items-center bg-white border-bottom-primary">
+            <!-- İkon -->
+            <div class="rounded-circle @Model.RenkClass d-flex align-items-center justify-content-center mr-3 text-white shadow-sm" style="width:50px; height:50px;">
+                <i class="@Model.ResimYolu fa-lg"></i>
+            </div>
+
+            <!-- Başlık ve Tarih -->
+            <div class="w-100">
+                <h5 class="m-0 font-weight-bold text-primary">@Model.Baslik</h5>
+                <small class="text-muted">@Model.Zaman</small>
+            </div>
+        </div>
+
+        <div class="card-body p-5">
+            <h4 class="mb-4 text-gray-800">Sayın Müşterimiz,</h4>
+
+            <p class="lead text-dark mb-5" style="line-height: 1.8;">
+                @Model.Icerik
+            </p>
+
+            <div class="alert alert-info border-0 bg-light text-dark" role="alert">
+                <i class="fas fa-info-circle mr-2 text-info"></i>
+                Bu kampanya Doruk Shop ayrıcalığıyla sunulmuştur. Keyifli alışverişler dileriz.
+            </div>
+
+            <hr class="my-4">
+
+            <div class="text-center">
+                <a href="~/Home/Index" class="btn btn-primary btn-lg px-5 shadow-sm">
+                    <i class="fas fa-shopping-bag mr-2"></i> Alışverişe Başla
+                </a>
+            </div>
+        </div>
+    </div>
+
+</div>
+

@@ -1,0 +1,100 @@
+﻿@{
+    ViewBag.Title = "Ayarlar";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<!-- Sayfa Başlığı -->
+<div class="d-sm-flex align-items-center justify-content-between mb-4">
+    <h1 class="h3 mb-0 text-gray-800">Sistem Ayarları</h1>
+</div>
+
+<div class="row">
+
+    <!-- SOL TARAF: Tema Ayarları -->
+    <div class="col-lg-6">
+        <div class="card shadow mb-4">
+            <div class="card-header py-3 border-bottom-primary">
+                <h6 class="m-0 font-weight-bold text-primary">Görünüm & Tema</h6>
+            </div>
+            <div class="card-body">
+                <p class="mb-4">Buradan menü renklerini ve sayfa temasını değiştirebilirsin. Ayarlar otomatik kaydedilir.</p>
+
+                <!-- Sidebar Rengi Seçimi -->
+                <div class="mb-4">
+                    <h6 class="font-weight-bold small text-uppercase text-gray-500">Menü (Sidebar) Rengi</h6>
+                    <div class="d-flex mt-2">
+                        <!-- Mavi -->
+                        <div class="theme-color-box bg-gradient-primary selected-theme" onclick="changeSidebarColor('primary', this)" title="Mavi">
+                            <i class="fas fa-check text-white check-icon"></i>
+                        </div>
+                        <!-- Kırmızı -->
+                        <div class="theme-color-box bg-gradient-danger" onclick="changeSidebarColor('danger', this)" title="Kırmızı">
+                            <i class="fas fa-check text-white check-icon d-none"></i>
+                        </div>
+                        <!-- Yeşil -->
+                        <div class="theme-color-box bg-gradient-success" onclick="changeSidebarColor('success', this)" title="Yeşil">
+                            <i class="fas fa-check text-white check-icon d-none"></i>
+                        </div>
+                        <!-- Koyu -->
+                        <div class="theme-color-box bg-gradient-dark" onclick="changeSidebarColor('dark', this)" title="Siyah">
+                            <i class="fas fa-check text-white check-icon d-none"></i>
+                        </div>
+                        <!-- Sarı -->
+                        <div class="theme-color-box bg-gradient-warning" onclick="changeSidebarColor('warning', this)" title="Sarı">
+                            <i class="fas fa-check text-white check-icon d-none"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <hr />
+
+                <!-- Dark Mode Seçimi -->
+                <div class="mb-2">
+                    <h6 class="font-weight-bold small text-uppercase text-gray-500">Arka Plan Modu</h6>
+                    <div class="btn-group btn-group-toggle mt-2 w-100" data-toggle="buttons">
+                        <label class="btn btn-light active border" onclick="toggleDarkMode(false)" style="width: 50%;">
+                            <input type="radio" name="options" id="option1" checked>
+                            <i class="fas fa-sun text-warning mr-2"></i> Aydınlık
+                        </label>
+                        <label class="btn btn-dark border" onclick="toggleDarkMode(true)" style="width: 50%;">
+                            <input type="radio" name="options" id="option2">
+                            <i class="fas fa-moon text-white mr-2"></i> Karanlık
+                        </label>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- SAĞ TARAF: Profil Formu (Görsel Amaçlı) -->
+    <div class="col-lg-6">
+        <div class="card shadow mb-4">
+            <div class="card-header py-3 border-bottom-success">
+                <h6 class="m-0 font-weight-bold text-success">Hesap Bilgileri</h6>
+            </div>
+            <div class="card-body">
+                <form>
+                    <div class="form-group">
+                        <label>E-posta Adresi</label>
+                        <input type="email" class="form-control" value="admin@dorukshop.com">
+                    </div>
+                    <div class="form-group">
+                        <label>Kullanıcı Adı</label>
+                        <input type="text" class="form-control" value="DorukAdmin">
+                    </div>
+                    <div class="form-group">
+                        <div class="custom-control custom-switch">
+                            <input type="checkbox" class="custom-control-input" id="customSwitch1" checked>
+                            <label class="custom-control-label" for="customSwitch1">Bildirimleri Al</label>
+                        </div>
+                    </div>
+                    <button type="button" class="btn btn-success btn-icon-split">
+                        <span class="icon text-white-50"><i class="fas fa-save"></i></span>
+                        <span class="text">Kaydet</span>
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

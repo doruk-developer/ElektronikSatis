@@ -1,0 +1,154 @@
+﻿@model IEnumerable<ElektronikSatisProje.Models.Urun>
+
+@{
+    ViewBag.Title = "Anasayfa";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<!-- 1. BÖLÜM: ANA KAMPANYA SLIDER'I (Sabit Görseller) -->
+<div id="kampanyaCarousel" class="carousel slide mb-5 shadow rounded overflow-hidden" data-ride="carousel">
+    <ol class="carousel-indicators">
+        <li data-target="#kampanyaCarousel" data-slide-to="0" class="active"></li>
+        <li data-target="#kampanyaCarousel" data-slide-to="1"></li>
+        <li data-target="#kampanyaCarousel" data-slide-to="2"></li>
+    </ol>
+    <div class="carousel-inner">
+        <!-- Slide 1 -->
+        <div class="carousel-item active" style="height: 400px; background-color: #4e73df;">
+            <div class="d-flex h-100 align-items-center justify-content-center text-white flex-column">
+                <h1 class="display-4 font-weight-bold">EFSANE KASIM İNDİRİMLERİ</h1>
+                <p class="lead">Seçili laptoplarda %20'ye varan indirimler!</p>
+                <a href="~/Home/Bilgisayarlar" class="btn btn-light btn-lg font-weight-bold text-primary">Alışverişe Başla</a>
+            </div>
+        </div>
+        <!-- Slide 2 -->
+        <div class="carousel-item" style="height: 400px; background-color: #1cc88a;">
+            <div class="d-flex h-100 align-items-center justify-content-center text-white flex-column">
+                <h1 class="display-4 font-weight-bold">YENİ NESİL TELEFONLAR</h1>
+                <p class="lead">Teknolojiyi cebinizde taşıyın.</p>
+                <a href="~/Home/Cep_Telefonları" class="btn btn-light btn-lg font-weight-bold text-success">İncele</a>
+            </div>
+        </div>
+        <!-- Slide 3 -->
+        <div class="carousel-item" style="height: 400px; background-color: #36b9cc;">
+            <div class="d-flex h-100 align-items-center justify-content-center text-white flex-column">
+                <h1 class="display-4 font-weight-bold">ENDÜSTRİYEL ÇÖZÜMLER</h1>
+                <p class="lead">İş yeriniz için en güçlü Router ve Switchler.</p>
+                <a href="~/Home/Switchler" class="btn btn-light btn-lg font-weight-bold text-info">Keşfet</a>
+            </div>
+        </div>
+    </div>
+    <a class="carousel-control-prev" href="#kampanyaCarousel" role="button" data-slide="prev">
+        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+        <span class="sr-only">Previous</span>
+    </a>
+    <a class="carousel-control-next" href="#kampanyaCarousel" role="button" data-slide="next">
+        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+        <span class="sr-only">Next</span>
+    </a>
+</div>
+
+<!-- 2. BÖLÜM: GÜNÜN FIRSATLARI BAŞLIĞI -->
+<div class="d-sm-flex align-items-center justify-content-between mb-4">
+    <h1 class="h3 mb-0 text-gray-800 font-weight-bold">🔥 Günün Fırsatları (En Uygun Fiyatlar)</h1>
+    <a href="@Url.Action("TumUrunler", "Home")" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm">
+        <i class="fas fa-arrow-right fa-sm text-white-50"></i> Tümünü Gör
+    </a>
+</div>
+
+<!-- 3. BÖLÜM: OTOMATİK KAYDIRMALI ÜRÜN LİSTESİ -->
+<!-- Depodan gelen veriler burada listelenir -->
+<div class="scrolling-wrapper row flex-row flex-nowrap mt-4 pb-4 pt-2">
+
+    @if (Model != null)
+    {
+        foreach (var urun in Model)
+        {
+            // MATEMATİK: Fiyatı %20 artırıp "Eski Fiyat" süsü veriyoruz
+            var fakeEskiFiyat = urun.Fiyat * 1.20m;
+
+            <div class="col-10 col-sm-6 col-md-4 col-lg-3">
+                <div class="card shadow h-100 product-card border-left-danger">
+
+                    <!-- İndirim Rozeti (Nabız Efektiyle) -->
+                    <div class="badge-overlay">
+                        <span class="badge badge-danger px-3 py-2 animate-pulse">%20 İNDİRİM</span>
+                    </div>
+
+                    <div class="img-container p-3">
+                        <img src="@urun.ResimYolu" class="card-img-top product-img" alt="@urun.Ad">
+                    </div>
+
+                    <div class="card-body d-flex flex-column p-3">
+                        <h6 class="card-title font-weight-bold text-dark text-truncate" title="@urun.Ad">
+                            @urun.Ad
+                        </h6>
+
+                        <div class="mt-auto">
+                            <!-- Çizili Eski Fiyat (Kırmızı) -->
+                            <div class="text-gray-500 small" style="text-decoration: line-through; color: #e74a3b !important;">
+                                @fakeEskiFiyat.ToString("N0") TL
+                            </div>
+
+                            <!-- Gerçek Fiyat (Yeşil ve Büyük) -->
+                            <h4 class="font-weight-bold text-success mb-3">
+                                @urun.Fiyat.ToString("N0") TL
+                            </h4>
+
+                            <!-- Sepete Ekle Butonu -->
+                            <button class="btn btn-outline-danger btn-block btn-sm"
+                                    onclick="addToCart('@urun.Ad', @((int)urun.Fiyat), '@urun.ResimYolu')">
+                                Hemen Al
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    }
+    else
+    {
+        <div class="col-12 text-center text-danger">
+            <p>Ürünler yüklenirken bir hata oluştu veya liste boş.</p>
+        </div>
+    }
+
+</div>
+
+<!-- Sadece Bu Sayfaya Özel CSS -->
+<style>
+    /* Yatay Kaydırma (Netflix Tarzı) */
+    .scrolling-wrapper {
+        overflow-x: auto;
+        overflow-y: hidden;
+        white-space: nowrap;
+        -webkit-overflow-scrolling: touch; /* Mobilde akıcılık */
+        padding-bottom: 10px;
+    }
+
+    /* Scrollbar Tasarımı */
+    .scrolling-wrapper::-webkit-scrollbar { height: 8px; }
+    .scrolling-wrapper::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 10px; }
+    .scrolling-wrapper::-webkit-scrollbar-thumb { background: #ccc; border-radius: 10px; }
+    .scrolling-wrapper::-webkit-scrollbar-thumb:hover { background: #888; }
+
+    /* Kart Tasarımı */
+    .product-card { transition: transform 0.2s; border: none; white-space: normal; }
+    .product-card:hover { transform: scale(1.03); }
+
+    .img-container {
+        height: 180px;
+        display: flex; align-items: center; justify-content: center; background-color: #fff;
+    }
+    .product-img { max-height: 100%; max-width: 100%; object-fit: contain; }
+
+    .badge-overlay { position: absolute; top: 10px; left: 10px; z-index: 5; }
+
+    /* Nabız Efekti (İndirim Yazısı İçin) */
+    @@keyframes pulse {
+        0% { transform: scale(1); }
+        50% { transform: scale(1.1); }
+        100% { transform: scale(1); }
+    }
+    .animate-pulse { animation: pulse 1.5s infinite; }
+</style>

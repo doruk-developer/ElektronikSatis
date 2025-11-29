@@ -1,0 +1,98 @@
+﻿
+@{
+    ViewBag.Title = "Register";
+    Layout = "~/Views/Shared/_Layout2.cshtml";
+}
+
+@{
+    Layout = null; // Bu sayfa ana şablonu kullanmasın, kendi başına bir sayfa olsun.
+}
+
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Kayıt Ol - Elektronik Satış Projesi</title>
+
+    <!-- NOT: Bu CSS linklerinin yollarının projenizle uyumlu olduğunu kontrol edin. -->
+    <link href="~/Content/Templates/Tema/CSS/all.min.css" rel="stylesheet" type="text/css">
+    <link href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i" rel="stylesheet">
+    <link href="~/Content/Templates/Tema/CSS/tema-2.min.css" rel="stylesheet">
+
+    <style>
+        .custom-bg {
+            background-color: #f8f9fc;
+        }
+    </style>
+</head>
+
+<body class="custom-bg">
+
+    <div class="container">
+        <div class="row justify-content-center align-items-center" style="height: 100vh;">
+            <div class="col-xl-6 col-lg-8 col-md-9">
+                <div class="card o-hidden border-0 shadow-lg my-5">
+                    <div class="card-body p-0">
+                        <div class="row">
+                            <div class="col-lg-12">
+                                <div class="p-5">
+                                    <div class="text-center">
+                                        <h1 class="h4 text-gray-900 mb-4">Yeni Hesap Oluşturun!</h1>
+                                    </div>
+
+                                    <!-- Hata Mesajını Göstermek İçin -->
+                                    @if (TempData["ErrorMessage"] != null)
+                                    {
+                                        <div class="alert alert-danger text-center">@TempData["ErrorMessage"]</div>
+                                    }
+
+                                    <form class="user" action="@Url.Action("Register", "Home")" method="post">
+                                        <div class="form-group">
+                                            <input type="text" class="form-control form-control-user" name="FullName"
+                                                   placeholder="Adınız Soyadınız..." required>
+                                        </div>
+                                        <div class="form-group">
+                                            <input type="email" class="form-control form-control-user" name="Email"
+                                                   placeholder="E-posta Adresiniz..." required>
+                                        </div>
+                                        <div class="form-group row">
+                                            <div class="col-sm-6 mb-3 mb-sm-0">
+                                                <input type="password" class="form-control form-control-user" name="Password"
+                                                       placeholder="Şifre" required>
+                                            </div>
+                                            <div class="col-sm-6">
+                                                <input type="password" class="form-control form-control-user" name="RepeatPassword"
+                                                       placeholder="Şifre Tekrar" required>
+                                            </div>
+                                        </div>
+                                        <button type="submit" class="btn btn-primary btn-user btn-block">
+                                            Hesap Oluştur
+                                        </button>
+                                    </form>
+                                    <hr>
+                                    <div class="text-center">
+                                        <a class="small" href="@Url.Action("ForgotPassword", "Login")">Şifreni mi unuttun?</a>
+                                    </div>
+                                    <div class="text-center">
+                                        <a class="small" href="@Url.Action("Index", "Login")">Zaten bir hesabınız var mı? Giriş Yapın!</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- NOT: Bu JS linklerinin yollarının projenizle uyumlu olduğunu kontrol edin. -->
+    <script src="~/Content/Templates/Tema/JS/jquery.min.js"></script>
+    <script src="~/Content/Templates/Tema/JS/bootstrap.bundle.min.js"></script>
+    <script src="~/Content/Templates/Tema/JS/jquery.easing.min.js"></script>
+    <script src="~/Content/Templates/Tema/JS/tema-2.js"></script>
+
+</body>
+</html>
+

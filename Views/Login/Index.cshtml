@@ -1,0 +1,132 @@
+﻿@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>Giriş Yap - Elektronik Satış</title>
+
+
+    <!-- Fontlar -->
+    <link href="~/Content/Templates/Tema/CSS/fontawesome.min.css" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i" rel="stylesheet">
+
+    <!-- Ana Tasarım Dosyası (SB Admin 2) -->
+    <link href="~/Content/Templates/Tema/CSS/tema-2.min.css" rel="stylesheet" />
+
+    <style>
+        /* ARKA PLAN RESMİ AYARLARI */
+        body {
+            /*Login arka plan resminin yolunu gösterdiğimiz kod bloğu. Yol:SE>Content>image>login_logo.png */
+            background-image: url('@Url.Content("~/Content/image/login_logo.png")');
+
+            /* Resmi ekrana yayma, ortalama ve sabitleme */
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            height: 100vh; /* Tüm ekran yüksekliği */
+        }
+
+        /* Login Kartının Ayarları */
+        .card {
+            /* Kartın arka planını hafif şeffaf beyaz (%90) yapıyoruz */
+            background-color: rgb(182, 255, 0, 0.6) !important;
+        }
+    </style>
+
+</head>
+
+<!-- 'bg-gradient-primary' sınıfını sildik, sadece kendi CSS'imiz geçerli -->
+<body>
+
+    <div class="container">
+
+        <!-- Dış Satır -->
+        <div class="row justify-content-center">
+
+            <div class="col-xl-10 col-lg-12 col-md-9">
+
+                <div class="card o-hidden border-0 shadow-lg my-5">
+                    <div class="card-body p-0">
+                        <!-- Kart İçeriği -->
+                        <div class="row">
+                            <!--
+                                Sol taraftaki resim alanı (Köpek resmi çıkan yer).
+                                Arka planın zaten resimli olduğu için burayı istersen kaldırabilirsin
+                                ama şimdilik şablon bozulmasın diye bıraktım.
+                            -->
+                            <div class="col-lg-6 d-none d-lg-block bg-login-image"></div>
+
+                            <div class="col-lg-6">
+                                <div class="p-5">
+                                    <div class="text-center">
+                                        <h1 class="h4 text-gray-900 mb-4">Mağazamıza Hoşgeldiniz</h1>
+                                    </div>
+
+                                    <form class="user" action="@Url.Action("CheckLogin", "Login")" method="post">
+                                        <div class="form-group">
+                                            <input type="text" class="form-control form-control-user"
+                                                   id="inpUsername" aria-describedby="emailHelp"
+                                                   placeholder="Email Adresiniz..." name="name">
+                                        </div>
+                                        <div class="form-group">
+                                            <input type="password" class="form-control form-control-user"
+                                                   id="exampleInputPassword" placeholder="Şifreniz" name="password">
+                                        </div>
+                                        <button type="submit" class="btn btn-primary btn-user btn-block">
+                                            Giriş Yap
+                                        </button>
+                                        <hr>
+                                    </form>
+
+                                    <!-- Nav Item - Pages Collapse Menu -->
+                                    <!--<li class="nav-item">
+                                        <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapsePages"
+                                           aria-expanded="true" aria-controls="collapsePages">
+                                            <i class="fas fa-fw fa-folder"></i>
+                                            <span>Üyelik Ayarları</span>
+                                        </a>
+                                        <div id="collapsePages" class="collapse" aria-labelledby="headingPages" data-parent="#accordionSidebar">
+                                            <div class="bg-white py-2 collapse-inner rounded">
+                                                <h6 class="collapse-header">Login Screens:</h6>
+                                                <a class="collapse-item" href="@Url.Action("Register", "Home")">Register</a>
+                                                <a class="collapse-item" href="@Url.Action("ForgotPassword", "Login")">Forgot Password</a>
+                                                <div class="collapse-divider"></div>
+                                            </div>
+                                        </div>
+                                    </li>-->
+
+                                    <hr>
+                                    <!-- Hata Mesajı Alanı -->
+                                    <h6 style="color:red; text-align:center;">@TempData["ErrorMessage"]</h6>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- JavaScript Dosyaları -->
+    <script src="~/Content/Templates/Tema/JS/jquery.min.js"></script>
+    <script src="~/Content/Templates/Tema/JS/bootstrap.bundle.min.js"></script>
+    <script src="~/Content/Templates/Tema/JS/jquery.easing.min.js"></script>
+    <script src="~/Content/Templates/Tema/JS/tema-2.js"></script>
+
+</body>
+
+</html>

@@ -1,0 +1,563 @@
+@{
+    // Mesajları depodan çekiyoruz
+    var bildirimler = ElektronikSatisProje.Models.MesajDeposu.MesajlariGetir();
+}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>Doruk Shop - @ViewBag.Title</title>
+
+    <!-- Favicon-->
+    <link rel="icon" href="~/Content/image/fav_icon.png" type="image/jpeg" />
+    <link rel="shortcut icon" href="~/Content/image/fav_icon.jpg" type="image/jpeg" />
+
+    <!-- Custom fonts for this template-->
+    <link href="~/Content/Templates/Tema/CSS/all.min.css" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i" rel="stylesheet">
+
+    <!-- Custom styles for this template-->
+    <link href="~/Content/Templates/Tema/CSS/tema-2.min.css" rel="stylesheet" />
+
+    <!----------------------------------------------Tema Ayarları İçin---------------------------------------------------->
+    <style>
+        /* Renk Kutucukları Tasarımı */
+        .theme-color-box {
+            width: 50px; /* Kutunun Genişliği */
+            height: 50px; /* Kutunun Yüksekliği */
+            border-radius: 8px; /* Köşeleri Yuvarlatma */
+            cursor: pointer; /* Üzerine gelince el işareti çıksın */
+            margin-right: 15px; /* Kutular arası boşluk */
+            display: flex; /* İkonu ortalamak için */
+            align-items: center;
+            justify-content: center;
+            border: 2px solid transparent; /* Seçili değilken kenarlık görünmesin */
+            transition: all 0.2s; /* Animasyonlu büyüme */
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1); /* Hafif gölge */
+        }
+
+            /* Üzerine gelince efekt */
+            .theme-color-box:hover {
+                transform: scale(1.1); /* Biraz büyüsün */
+            }
+
+            /* Seçili Olan Kutunun Özellikleri */
+            .theme-color-box.selected-theme {
+                border: 3px solid #5a5c69; /* Etrafına kalın gri çizgi */
+                transform: scale(1.1);
+                box-shadow: 0 0 15px rgba(0,0,0,0.3);
+            }
+
+        /* Tık İkonu */
+        .check-icon {
+            font-size: 1.2rem;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.4);
+        }
+
+        /* --- DARK MODE STİLLERİ --- */
+        body.dark-mode {
+            background-color: #121212 !important;
+            color: #e0e0e0;
+        }
+
+            body.dark-mode #content-wrapper {
+                background-color: #121212 !important;
+            }
+
+            body.dark-mode .card {
+                background-color: #1e1e1e !important;
+                border-color: #333;
+                color: #e0e0e0;
+            }
+
+            body.dark-mode .topbar {
+                background-color: #1e1e1e !important;
+                border-bottom: 1px solid #333 !important;
+            }
+
+            body.dark-mode .text-gray-800,
+            body.dark-mode h1, body.dark-mode h2, body.dark-mode h3 {
+                color: #e0e0e0 !important;
+            }
+
+            body.dark-mode .form-control {
+                background-color: #2d2d2d;
+                border-color: #444;
+                color: #fff;
+            }
+    </style>
+    <!----------------------------------------------Tema Ayarları İçin---------------------------------------------------->
+</head>
+
+<body id="page-top">
+
+    <!-- Page Wrapper -->
+    <div id="wrapper">
+
+        <!-- Sidebar -->
+        <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar">
+
+            <!-- Sidebar - Brand -->
+            <a class="sidebar-brand d-flex align-items-center justify-content-center" href="~/Home/Index">
+                <div class="sidebar-brand-icon rotate-n-15">
+                    <i class="fas fa-laugh-wink"></i>
+                </div>
+                <div class="sidebar-brand-text mx-3">Doruk<br>Shop</div>
+            </a>
+
+            <!-- Divider -->
+            <hr class="sidebar-divider my-0">
+
+            <!-- Nav Item - Ana Sayfa -->
+            <li class="nav-item active">
+                <a class="nav-link" href="~/Home/Index">
+                    <i class="fas fa-fw fa-tachometer-alt"></i>
+                    <span>Ana Sayfa</span>
+                </a>
+            </li>
+
+            <!-- Divider -->
+            <hr class="sidebar-divider">
+
+            <!-- Heading -->
+            <div class="sidebar-heading">
+                Ürünler
+            </div>
+
+            <!-- Nav Item - Pages Collapse Menu -->
+            <li class="nav-item">
+                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseTwo"
+                   aria-expanded="true" aria-controls="collapseTwo">
+                    <i class="fas fa-fw fa-cog"></i>
+                    <span>Ev Elektroniği</span>
+                </a>
+                <div id="collapseTwo" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
+                    <div class="bg-white py-2 collapse-inner rounded">
+                        <h6 class="collapse-header">Ev Elektroniği:</h6>
+                        <a class="collapse-item" href="~/home/Bilgisayarlar">Bilgisayarlar</a>
+                        <a class="collapse-item" href="~/home/Cep_Telefonları">Cep Telefonları</a>
+                    </div>
+                </div>
+            </li>
+
+            <!-- Nav Item - Utilities Collapse Menu -->
+            <li class="nav-item">
+                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseUtilities"
+                   aria-expanded="true" aria-controls="collapseUtilities">
+                    <i class="fas fa-fw fa-wrench"></i>
+                    <span>Endüstriyel Elektronik</span>
+                </a>
+                <div id="collapseUtilities" class="collapse" aria-labelledby="headingUtilities"
+                     data-parent="#accordionSidebar">
+                    <div class="bg-white py-2 collapse-inner rounded">
+                        <h6 class="collapse-header">Endüstriyel Elektronik:</h6>
+                        <a class="collapse-item" href="~/home/Switchler">Switchler</a>
+                        <a class="collapse-item" href="~/home/Routerlar">Routerlar</a>
+                    </div>
+                </div>
+            </li>
+
+            <!-- Divider -->
+            <hr class="sidebar-divider">
+
+                      
+
+            <!-- Nav Item - Geçmiş Siparişlerim -->
+            <li class="nav-item">
+                <a class="nav-link" href="@Url.Action("Gecmis_Siparislerim", "Home")">
+                    <i class="fas fa-fw fa-chart-area"></i>
+                    <span>Geçmiş Siparişlerim</span>
+                </a>
+            </li>
+
+            <!-- Divider -->
+            <hr class="sidebar-divider d-none d-md-block">
+
+            <!-- Sidebar Toggler (Sidebar) -->
+            <div class="text-center d-none d-md-inline">
+                <button class="rounded-circle border-0" id="sidebarToggle"></button>
+            </div>
+
+        </ul>
+        <!-- End of Sidebar -->
+        <!-- Content Wrapper -->
+        <div id="content-wrapper" class="d-flex flex-column">
+
+            <!-- Main Content -->
+            <div id="content">
+
+                <!-- Topbar -->
+                <nav class="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top shadow">
+
+                    <!-- Sidebar Toggle (Topbar) -->
+                    <button id="sidebarToggleTop" class="btn btn-link d-md-none rounded-circle mr-3">
+                        <i class="fa fa-bars"></i>
+                    </button>
+
+                    <!-- Topbar Search -->
+                    <form action="@Url.Action("Arama", "Home")" method="get" class="d-none d-sm-inline-block form-inline mr-auto ml-md-3 my-2 my-md-0 mw-100 navbar-search">
+                        <div class="input-group">
+                            <!-- name="q" parametresi çok önemli, controller bunu yakalayacak -->
+                            <input type="text" name="q" class="form-control bg-light border-0 small" placeholder="Ürün, marka veya kategori ara..." aria-label="Search" aria-describedby="basic-addon2">
+                            <div class="input-group-append">
+                                <button class="btn btn-primary theme-search-btn" type="submit">
+                                    <i class="fas fa-search fa-sm"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+
+                    <!-- Topbar Navbar -->
+                    <ul class="navbar-nav ml-auto">
+
+                        <!-- Nav Item - Search Dropdown (Visible Only XS) -->
+                        <li class="nav-item dropdown no-arrow d-sm-none">
+                            <a class="nav-link dropdown-toggle" href="#" id="searchDropdown" role="button"
+                               data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                <i class="fas fa-search fa-fw"></i>
+                            </a>
+                            <!-- Dropdown - Messages -->
+                            <div class="dropdown-menu dropdown-menu-right p-3 shadow animated--grow-in"
+                                 aria-labelledby="searchDropdown">
+                                <form class="form-inline mr-auto w-100 navbar-search">
+                                    <div class="input-group">
+                                        <input type="text" class="form-control bg-light border-0 small"
+                                               placeholder="Search for..." aria-label="Search"
+                                               aria-describedby="basic-addon2">
+                                        <div class="input-group-append">
+                                            <button class="btn btn-primary" type="button">
+                                                <i class="fas fa-search fa-sm"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                        </li>
+
+                        <!-- Nav Item - Kampanya Mesajları -->
+                        <li class="nav-item dropdown no-arrow mx-1">
+                            <a class="nav-link dropdown-toggle" href="#" id="messagesDropdown" role="button"
+                               data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                <i class="fas fa-envelope fa-fw"></i>
+
+                                <!-- DİNAMİK SAYAÇ -->
+                                @if (bildirimler.Count > 0)
+                                {
+                                <span class="badge badge-danger badge-counter">@bildirimler.Count</span>
+                                }
+                            </a>
+
+                            <!-- Açılır Liste -->
+                            <div class="dropdown-list dropdown-menu dropdown-menu-right shadow animated--grow-in"
+                                 aria-labelledby="messagesDropdown">
+                                <h6 class="dropdown-header">
+                                    Kampanyalar & Bildirimler
+                                </h6>
+
+                                <!-- DÖNGÜ BAŞLIYOR -->
+                                @foreach (var mesaj in bildirimler)
+                                {
+                                <!-- İŞTE BURASI DEĞİŞTİ: href içine Url.Action ile ID gönderiyoruz -->
+                                <a class="dropdown-item d-flex align-items-center" href="@Url.Action("MesajOku", "Home", new { id=mesaj.Id })">
+                                    <div class="dropdown-list-image mr-3">
+                                        <!-- İkon ve Arka Plan Rengi -->
+                                        <div class="rounded-circle @mesaj.RenkClass d-flex align-items-center justify-content-center" style="width:40px; height:40px;">
+                                            <i class="@mesaj.ResimYolu text-white"></i>
+                                        </div>
+                                    </div>
+                                    <div class="font-weight-bold">
+                                        <div class="text-truncate">@mesaj.Icerik</div>
+                                        <div class="small text-gray-500">@mesaj.Baslik · @mesaj.Zaman</div>
+                                    </div>
+                                </a>
+                                }
+                                <!-- DÖNGÜ BİTİŞİ -->
+                                <!-- TÜM MESAJLAR LİNKİ -->
+                                <a class="dropdown-item text-center small text-gray-500" href="@Url.Action("Mesajlarim", "Home")">Tüm Mesajları Oku</a>
+                            </div>
+                        </li>
+
+
+                        <!--Alışveriş sepetinin sistem tarafından tanınmasını ve ilgili sayının tutulmasını sağlayan kodlar-->
+                        <!-- Nav Item - Sepetim (Resimli) -->
+                        <li class="nav-item no-arrow mx-1">
+                            <!-- Dropdown özelliklerini sildik, direkt href verdik -->
+                            <a class="nav-link" href="@Url.Action("Sepet", "Home")" role="button">
+
+                                <span class="mr-2 d-none d-lg-inline text-gray-600 small font-weight-bold">Sepetim</span>
+
+                                <img src="~/Content/image/sembol_sepet.png" alt="Sepet" style="height: 35px; width: auto; object-fit: contain;">
+
+                                <span class="badge badge-danger badge-counter" id="cartItemCount" style="margin-left: -10px; margin-top: -10px; display: none;">0</span>
+                            </a>
+                        </li>
+                        <!--Alışveriş sepetinin sistem tarafından tanınmasını ve ilgili sayının tutulmasını sağlayan kodlar-->
+
+                        <div class="topbar-divider d-none d-sm-block"></div>
+
+                        <!-- Nav Item - User Information -->
+                        <li class="nav-item dropdown no-arrow">
+                            <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button"
+                               data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                <span class="mr-2 d-none d-lg-inline text-gray-600 small">Hesap İşlemleri</span>
+
+                                <!------Profil resminin kaydının tutulması için dinamik yol veriyoruz-->
+                                <img class="img-profile rounded-circle"
+                                     src="@ElektronikSatisProje.Controllers.HomeController.MevcutProfil.ResimYolu"
+                                     style="width: 40px; height: 40px; object-fit: cover;" />
+
+                            </a>
+                            <!-- Dropdown - User Information -->
+                            <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in"
+                                 aria-labelledby="userDropdown">
+                                <a class="dropdown-item" href="~/Home/Profil">
+                                    <i class="fas fa-user fa-sm fa-fw mr-2 text-gray-400"></i>
+                                    Profil
+                                </a>
+
+
+                                <!--Settings butonunun linki burası-->
+                                <a class="dropdown-item" href="@Url.Action("Settings", "Home")">
+                                    <i class="fas fa-cogs fa-sm fa-fw mr-2 text-gray-400"></i>
+                                    Ayarlar
+                                </a>
+
+
+
+                                <div class="dropdown-divider"></div>
+                                <a class="dropdown-item" href="#" data-toggle="modal" data-target="#logoutModal">
+                                    <i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i>
+                                    Logout
+                                </a>
+                            </div>
+                        </li>
+
+                    </ul>
+
+                </nav>
+                <!-- End of Topbar -->
+                <!-- Begin Page Content -->
+                <div class="container-fluid">
+
+                    <!-- Index.cshtml içeriği buraya gelecek -->
+                    @RenderBody()
+
+                </div>
+                <!-- /.container-fluid -->
+
+            </div>
+            <!-- End of Main Content -->
+            <!-- Footer Bölümü-->
+            <footer class="sticky-footer bg-white border-top mt-5">
+                <div class="container my-auto">
+                    <div class="row">
+                        <!-- Hakkımızda -->
+                        <div class="col-md-4 mb-4">
+                            <h5 class="font-weight-bold text-primary">Doruk Shop</h5>
+                            <p class="small">Teknolojinin en uygun fiyatlı adresi. Bilgisayardan endüstriyel elektroniğe kadar aradığınız her şey burada.</p>
+                        </div>
+
+                        <!-- Hızlı Linkler -->
+                        <div class="col-md-4 mb-4">
+                            <h6 class="font-weight-bold">Hızlı Erişim</h6>
+                            <ul class="list-unstyled small">
+                                <li><a href="@Url.Action("Index", "Home")">Ana Sayfa</a></li>                                                         
+                                <li><a href="@Url.Action("Bilgisayarlar", "Home")">Bilgisayarlar</a></li>                                            
+                                <li><a href="@Url.Action("Switchler", "Home")">Switchler</a></li>                                    
+                                <li><a href="@Url.Action("İletisim", "Home")">İletişim</a></li>
+                            </ul>
+                        </div>
+
+                        <!-- İletişim -->
+                        <div class="col-md-4 mb-4">
+                            <h6 class="font-weight-bold">Bize Ulaşın</h6>
+                            <p class="small mb-1"><i class="fas fa-map-marker-alt mr-2"></i> Teknoloji Vadisi, İstanbul</p>
+                            <p class="small mb-1"><i class="fas fa-phone mr-2"></i> 0850 123 45 67</p>
+                            <p class="small"><i class="fas fa-envelope mr-2"></i> info@dorukshop.com</p>
+                        </div>
+                    </div>
+                    <div class="copyright text-center my-auto border-top pt-3">
+                        <span>Copyright &copy; Doruk Shop 2025 - Tüm Hakları Saklıdır.</span>
+                    </div>
+                </div>
+            </footer>
+            <!-- End of Footer -->
+
+        </div>
+        <!-- End of Content Wrapper -->
+
+    </div>
+    <!-- End of Page Wrapper -->
+    <!-- Scroll to Top Button-->
+    <a class="scroll-to-top rounded" href="#page-top">
+        <i class="fas fa-angle-up"></i>
+    </a>
+
+    <!-- Logout Modal-->
+    <div class="modal fade" id="logoutModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+         aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Ready to Leave?</h5>
+                    <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">×</span>
+                    </button>
+                </div>
+                <div class="modal-body">Select "Logout" below if you are ready to end your current session.</div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
+                    <a class="btn btn-primary" href="@Url.Action("Logout", "Login")">Logout</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap core JavaScript-->
+    <script src="~/Content/Templates/Tema/JS/jquery.min.js"></script>
+    <script src="~/Content/Templates/Tema/JS/bootstrap.bundle.min.js"></script>
+
+    <!-- Core plugin JavaScript-->
+    <script src="~/Content/Templates/Tema/JS/jquery.easing.min.js"></script>
+
+    <!-- Custom scripts for all pages-->
+    <script src="~/Content/Templates/Tema/JS/tema-2.js"></script>
+
+    <!-- Sayfaya özel scriptler buraya inject edilecek -->
+    @RenderSection("Scripts", required: false)
+
+
+    <!-----------------------------------------Tema Yönetim Kodları-------------------------------------------------------------->
+
+    <script>
+        $(document).ready(function () {
+            calculateCartTotal(); // Sayfa açılınca sayıyı hesapla
+
+            // Diğer tema ayarları...
+            var savedColor = localStorage.getItem('sidebarColor') || 'primary';
+            applySidebarColor(savedColor);
+            updateColorSelectionUI(savedColor);
+
+            var savedDarkMode = localStorage.getItem('darkMode');
+            if (savedDarkMode === 'true') toggleDarkMode(true);
+        });
+
+        // --- 1. SEPETE ÜRÜN EKLEME (Detaylı) ---
+        // Artık bu fonksiyon isim, resim ve fiyat bilgisi alıyor
+        function addToCart(productName, price, imagePath) {
+            // 1. Mevcut sepeti çek (Yoksa boş liste oluştur)
+            var cart = JSON.parse(localStorage.getItem('myShoppingCart')) || [];
+
+            // 2. Bu ürün zaten sepette var mı kontrol et
+            var existingProduct = cart.find(x => x.name === productName);
+
+            if (existingProduct) {
+                // Varsa: Adedini artır
+                existingProduct.quantity++;
+            } else {
+                // Yoksa: Yeni ürün olarak listeye ekle
+                cart.push({
+                    name: productName,
+                    price: price,
+                    image: imagePath,
+                    quantity: 1
+                });
+            }
+
+            // 3. Listeyi tekrar hafızaya kaydet
+            localStorage.setItem('myShoppingCart', JSON.stringify(cart));
+
+            // 4. Rozeti güncelle
+            calculateCartTotal();
+
+            // Ufak bir bildirim (İstersen SweetAlert kullanabilirsin)
+            // alert(productName + " sepete eklendi!");
+        }
+
+        // --- 2. SEPET TOPLAMINI HESAPLA VE YAZ ---
+        function calculateCartTotal() {
+            var cart = JSON.parse(localStorage.getItem('myShoppingCart')) || [];
+
+            // Tüm ürünlerin adetlerini topla (Örn: 2 Laptop + 1 Telefon = 3)
+            var totalCount = 0;
+            cart.forEach(function (item) {
+                totalCount += item.quantity;
+            });
+
+            // Rozeti güncelle
+            $('#cartItemCount').text(totalCount);
+
+            if (totalCount > 0) {
+                $('#cartItemCount').show();
+            } else {
+                $('#cartItemCount').hide();
+            }
+        }
+
+        // --- 3. TEMA FONKSİYONLARI ---
+        function changeSidebarColor(color, element) {
+            localStorage.setItem('sidebarColor', color);
+            applySidebarColor(color);
+            if (element) {
+                $('.theme-color-box').removeClass('selected-theme');
+                $('.check-icon').addClass('d-none');
+                $(element).addClass('selected-theme');
+                $(element).find('.check-icon').removeClass('d-none');
+            }
+        }
+
+        function applySidebarColor(color) {
+            var sidebar = $('#accordionSidebar');
+            sidebar.removeClass('bg-gradient-primary bg-gradient-danger bg-gradient-success bg-gradient-dark bg-gradient-warning');
+            sidebar.addClass('bg-gradient-' + color);
+
+            var searchBtns = $('.theme-search-btn');
+            searchBtns.removeClass('btn-primary btn-danger btn-success btn-dark btn-warning');
+            searchBtns.addClass('btn-' + color);
+        }
+
+        function updateColorSelectionUI(color) {
+            if ($('.theme-color-box').length > 0) {
+                $('.theme-color-box').removeClass('selected-theme');
+                $('.check-icon').addClass('d-none');
+                var targetBox = $(".theme-color-box[onclick*='" + color + "']");
+                if (targetBox.length > 0) {
+                    targetBox.addClass('selected-theme');
+                    targetBox.find('.check-icon').removeClass('d-none');
+                }
+            }
+        }
+
+        function toggleDarkMode(isDark) {
+            if (isDark) {
+                $('body').addClass('dark-mode');
+                localStorage.setItem('darkMode', 'true');
+                if ($('#option2').length > 0) {
+                    $('#option2').prop('checked', true);
+                    $('#option2').parent().addClass('active');
+                    $('#option1').parent().removeClass('active');
+                }
+            } else {
+                $('body').removeClass('dark-mode');
+                localStorage.setItem('darkMode', 'false');
+                if ($('#option1').length > 0) {
+                    $('#option1').prop('checked', true);
+                    $('#option1').parent().addClass('active');
+                    $('#option2').parent().removeClass('active');
+                }
+            }
+        }
+    </script>
+
+    <!-----------------------------------------Tema Yönetim Kodları-------------------------------------------------------------->
+
+
+</body>
+</html>

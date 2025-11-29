@@ -1,0 +1,134 @@
+﻿
+@model IEnumerable<ElektronikSatisProje.Models.Urun>
+
+@{
+    ViewBag.Title = "TumUrunler";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<!-- Başlık ve Ürün Sayısı -->
+<div class="d-sm-flex align-items-center justify-content-between mb-4">
+    <h1 class="h3 mb-0 text-gray-800">Tüm Ürünlerimiz</h1>
+    <span class="badge badge-primary p-2">Toplam @Model.Count() ürün listeleniyor</span>
+</div>
+
+<div class="row">
+    @foreach (var urun in Model)
+    {
+        <div class="col-lg-3 col-md-6 mb-4">
+            <div class="card shadow h-100 product-card">
+
+                <!-- Rozet -->
+                <div class="badge-overlay">
+                    <span class="badge @urun.RozetClass px-3 py-2">@urun.Rozet</span>
+                </div>
+
+                <!-- RESİM ALANI -->
+                <div class="img-container p-3">
+                    <a href="@Url.Action("UrunDetay", "Home", new { id = urun.Id })">
+                        <img src="@urun.ResimYolu" class="card-img-top product-img" alt="@urun.Ad">
+                    </a>
+                </div>
+
+                <div class="card-body d-flex flex-column">
+                    <!-- BAŞLIK -->
+                    <a href="@Url.Action("UrunDetay", "Home", new { id = urun.Id })" class="text-decoration-none text-dark">
+                        <h6 class="card-title font-weight-bold" style="height: 40px; overflow: hidden;">
+                            @urun.Ad
+                        </h6>
+                    </a>
+
+                    <div class="mt-auto">
+                        <!-- Kampanya -->
+                        <div class="mb-2">
+                            <span class="badge badge-light text-primary border border-primary">
+                                @(string.IsNullOrEmpty(urun.Kampanya) ? "Fırsat Ürünü" : urun.Kampanya)
+                            </span>
+                        </div>
+
+                        <!-- Fiyat -->
+                        <h4 class="font-weight-bold text-dark mb-3">@urun.Fiyat.ToString("N0") TL</h4>
+
+                        <!-- BUTONLAR -->
+                        <div class="row no-gutters">
+                            <div class="col-6 pr-1">
+                                <a href="@Url.Action("UrunDetay", "Home", new { id = urun.Id })" class="btn btn-light btn-block border">
+                                    <i class="fas fa-search fa-sm"></i> İncele
+                                </a>
+                            </div>
+                            <div class="col-6 pl-1">
+                                <button class="btn btn-primary btn-block add-to-cart-btn"
+                                        onclick="addToCart('@urun.Ad', @((int)urun.Fiyat), '@urun.ResimYolu')">
+                                    <i class="fas fa-cart-plus"></i> Ekle
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+<!-- CSS (STANDART TASARIMIMIZ) -->
+<style>
+    .product-card {
+        transition: transform 0.2s;
+        border: 1px solid #e3e6f0;
+        background-color: #fff;
+        overflow: hidden;
+        height: 100%;
+    }
+
+        .product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.15) !important;
+            border-color: #4e73df;
+        }
+
+    .img-container {
+        height: 250px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background-color: #fff;
+        border-bottom: 1px solid #f1f1f1;
+        padding: 15px;
+    }
+
+    .product-img {
+        max-height: 100%;
+        max-width: 100%;
+        object-fit: contain;
+        width: auto;
+        height: auto;
+    }
+
+    .badge-overlay {
+        position: absolute;
+        top: 10px;
+        left: 10px;
+        z-index: 5;
+    }
+
+    a.text-decoration-none:hover {
+        color: #4e73df !important;
+        text-decoration: none;
+    }
+
+    /* Dark Mode */
+    body.dark-mode .product-card {
+        background-color: #1e1e1e;
+        border-color: #333;
+    }
+
+    body.dark-mode .img-container {
+        background-color: #1e1e1e;
+        border-bottom: 1px solid #333;
+    }
+
+    body.dark-mode .text-dark {
+        color: #e0e0e0 !important;
+    }
+</style>
+
