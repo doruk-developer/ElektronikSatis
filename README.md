@@ -75,6 +75,16 @@ To run this project locally:
 5.  *Important Note: The system will automatically generate the necessary JSON data files (`kullanici_listesi.json`, `urunler.json`) in the `App_Data` folder upon the first run.*
 
 ---
+## 🔐 Default Login Credentials
+
+When you run the project for the first time, the system will automatically generate a default **Admin User**. You can use these credentials to access the Admin Panel:
+
+| Role | Username | Password |
+| :--- | :--- | :--- |
+| **Admin** | `Doruk` | `şifre` |
+
+> **Note:** Since the project uses a file-based database, these credentials are created in `App_Data/kullanici_listesi.json` upon the first launch.
+---
 
 ## ⚠️ Technical Notes & Disclaimers
 

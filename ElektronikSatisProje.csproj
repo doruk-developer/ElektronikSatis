@@ -106,12 +106,18 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="App_Data\GonderilenSMSler\SonGonderilenSMS.txt" />
+    <Content Include="Content\image\custom_profile_doruk.jpg" />
     <Content Include="Content\image\default.jpg" />
     <Content Include="Content\image\fav_icon.png" />
     <Content Include="Content\image\laptop1.jpg" />
     <Content Include="Content\image\laptop2.jpg" />
     <Content Include="Content\image\laptop3.jpg" />
+    <Content Include="Content\image\laptop4.jpg" />
     <Content Include="Content\image\login_logo.png" />
+    <Content Include="Content\image\profile_ahmet.jpg" />
+    <Content Include="Content\image\profile_ali.jpg" />
+    <Content Include="Content\image\profile_Doruk.jpg" />
     <Content Include="Content\image\router1.jpg" />
     <Content Include="Content\image\router2.jpg" />
     <Content Include="Content\image\sembol_sepet.png" />
@@ -177,6 +183,8 @@
   <ItemGroup>
     <Content Include="Views\web.config" />
     <Content Include="App_Data\urunler.json" />
+    <Content Include="App_Data\kullanici_ayarlari.json" />
+    <Content Include="App_Data\kullanici_listesi.json" />
     <None Include="packages.config" />
     <Content Include="Views\Login\Index.cshtml" />
     <Content Include="Views\Home\Index.cshtml" />
