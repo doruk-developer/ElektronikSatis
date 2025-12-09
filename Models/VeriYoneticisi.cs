@@ -1,58 +1,84 @@
-﻿using System;
+﻿using System.Collections.Generic;
 using System.IO;
 using System.Web;
-using System.Web.Script.Serialization; // JSON işlemleri için (System.Web.Extensions referansı gerekebilir)
+using System.Web.Script.Serialization;
 
 namespace ElektronikSatisProje.Models
 {
-    // Bu sınıf bizim veritabanımız gibi davranacak
+    // 1. KULLANICI VERİSİ MODELİ (Artık dışarıda ve herkes erişebilir)
+    // 1. KULLANICI VERİSİ MODELİ
+    public class KullaniciVerisi
+    {
+        public string KullaniciAdi { get; set; } = "Doruk";
+        public string Sifre { get; set; } = "şifre";
+        public Models.Profil ProfilBilgisi { get; set; }
+
+        // --- YENİ EKLENEN: KİŞİSEL MESAJ KUTUSU ---
+        public List<Models.Mesaj> Mesajlar { get; set; } = new List<Models.Mesaj>();
+
+        // --- YENİ EKLENEN: SİPARİŞ GEÇMİŞİ(Kişiye özel siparişleri göstermek için) ---
+        // Not: Sipariş sınıfın yoksa Models klasörüne Siparis.cs eklemelisin
+        public List<Models.Siparis> Siparisler { get; set; } = new List<Models.Siparis>();
+
+        // --- YENİ EKLENEN: FAVORİ ID LİSTESİ ---
+        public List<int> FavoriUrunIdleri { get; set; } = new List<int>();
+
+        // YENİ: Girişe gizli admin kontrolü
+        public bool IsAdmin { get; set; } = false;
+    }
+
+    // 2. VERİ YÖNETİCİSİ (Veritabanı İşlemleri)
     public static class VeriYoneticisi
     {
-        // Dosyanın kaydedileceği yer (App_Data klasörü güvenlidir, dışarıdan erişilmez)
-        private static string DosyaYolu = HttpContext.Current.Server.MapPath("~/App_Data/kullanici_ayarlari.json");
+        // Dosya yolu: App_Data klasörü
+        private static string DosyaYolu = HttpContext.Current.Server.MapPath("~/App_Data/kullanici_listesi.json");
 
-        // Kaydedilecek Veri Modeli
-        public class KullaniciVerisi
-        {
-            public string KullaniciAdi { get; set; } = "Doruk";
-            public string Sifre { get; set; } = "rICA"; // Varsayılan şifre
-            public Models.Profil ProfilBilgisi { get; set; }
-        }
-
-        // VERİYİ OKU
-        public static KullaniciVerisi VeriyiGetir()
+        // --- OKUMA İŞLEMİ (LİSTE DÖNER) ---
+        public static List<KullaniciVerisi> VerileriGetir()
         {
             if (!File.Exists(DosyaYolu))
             {
-                // Eğer dosya henüz yoksa (ilk çalıştırış), varsayılan bir tane oluştur
-                var varsayilan = new KullaniciVerisi
+                // Dosya yoksa varsayılan kullanıcıyla oluştur
+                var varsayilanListe = new List<KullaniciVerisi>();
+                varsayilanListe.Add(new KullaniciVerisi
                 {
+                    KullaniciAdi = "Doruk",
+                    Sifre = "şifre",
                     ProfilBilgisi = new Models.Profil
                     {
                         Ad = "Doruk",
                         Soyad = "Yılmaz",
-                        Email = "admin@dorukshop.com",
+                        Email = "mail1@google.com",
                         Telefon = "0555 123 45 67",
                         Sehir = "İstanbul",
                         ResimYolu = "/Content/image/user_circle.png"
                     }
-                };
-                VeriyiKaydet(varsayilan);
-                return varsayilan;
+                });
+
+                VerileriKaydet(varsayilanListe);
+                return varsayilanListe;
             }
 
-            // Dosya varsa oku ve C# nesnesine çevir
+            // Dosya varsa oku ve listeye çevir
             string jsonText = File.ReadAllText(DosyaYolu);
             JavaScriptSerializer serializer = new JavaScriptSerializer();
-            return serializer.Deserialize<KullaniciVerisi>(jsonText);
+            return serializer.Deserialize<List<KullaniciVerisi>>(jsonText);
         }
 
-        // VERİYİ KAYDET
-        public static void VeriyiKaydet(KullaniciVerisi veri)
+        // --- KAYDETME İŞLEMİ (LİSTEYİ YAZAR) ---
+        public static void VerileriKaydet(List<KullaniciVerisi> liste)
         {
             JavaScriptSerializer serializer = new JavaScriptSerializer();
-            string jsonText = serializer.Serialize(veri);
+            string jsonText = serializer.Serialize(liste);
             File.WriteAllText(DosyaYolu, jsonText);
+        }
+
+        // --- TEK KULLANICI EKLEME YARDIMCISI ---
+        public static void KullaniciEkle(KullaniciVerisi yeniKullanici)
+        {
+            var liste = VerileriGetir();
+            liste.Add(yeniKullanici);
+            VerileriKaydet(liste);
         }
     }
 }
