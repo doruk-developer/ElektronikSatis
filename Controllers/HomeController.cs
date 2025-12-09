@@ -2,7 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Web;
 using System.Web.Mvc;
 
 namespace ElektronikSatisProje.Controllers
@@ -26,24 +25,78 @@ namespace ElektronikSatisProje.Controllers
         }
         //-------------Profil resmi ayarları--------------------
 
-        // 1. Profil verisini hafızada tutmak için static bir değişken tanımlıyoruz.
-        // Böylece resim yüklenince sayfa yenilense bile yeni resim yolu burada kalır.
-        public static Models.Profil MevcutProfil = new Models.Profil
-        {
-            Ad = "Doruk",
-            Soyad = "Yılmaz",
-            Email = "admin@dorukshop.com",
-            Telefon = "0555 123 45 67",
-            Sehir = "İstanbul",
-            // Başlangıçta varsayılan resim
-            ResimYolu = Models.VeriYoneticisi.VeriyiGetir().ProfilBilgisi.ResimYolu
-        };
+
 
         public ActionResult Profil()
         {
-            // Veriyi dosyadan oku ve View'a gönder
-            var veri = Models.VeriYoneticisi.VeriyiGetir();
-            return View(veri.ProfilBilgisi);
+            string girisYapanIsim = User.Identity.Name;
+            var liste = Models.VeriYoneticisi.VerileriGetir();
+            var aktifKullanici = liste.FirstOrDefault(x => x.KullaniciAdi == girisYapanIsim);
+
+            if (aktifKullanici == null) return RedirectToAction("Logout", "Login");
+
+            // Sipariş Sayısı
+            int siparisSayisi = aktifKullanici.Siparisler != null ? aktifKullanici.Siparisler.Count : 0;
+            ViewBag.SiparisAdedi = siparisSayisi;
+
+            // --- YENİ KISIM: FAVORİLERİ HAZIRLA ---
+            var favoriUrunler = new List<Models.Urun>();
+            if (aktifKullanici.FavoriUrunIdleri != null && aktifKullanici.FavoriUrunIdleri.Count > 0)
+            {
+                // Tüm ürün kataloğunu çek
+                var tumUrunler = Models.UrunDeposu.UrunleriGetir();
+
+                // Favori ID'leri ile eşleşen ürünleri bul
+                favoriUrunler = tumUrunler.Where(x => aktifKullanici.FavoriUrunIdleri.Contains(x.Id)).ToList();
+            }
+            ViewBag.Favoriler = favoriUrunler;
+            // --------------------------------------
+
+            return View(aktifKullanici.ProfilBilgisi);
+        }
+
+        [HttpPost]
+        public ActionResult AdresEkle(Models.Adres yeniAdres)
+        {
+            var liste = Models.VeriYoneticisi.VerileriGetir();
+            var aktifKullanici = liste.FirstOrDefault(x => x.KullaniciAdi == User.Identity.Name);
+
+            if (aktifKullanici != null)
+            {
+                // Listeyi başlat (Eğer null ise)
+                if (aktifKullanici.ProfilBilgisi.Adresler == null)
+                    aktifKullanici.ProfilBilgisi.Adresler = new List<Models.Adres>();
+
+                // Yeni adresi ekle
+                aktifKullanici.ProfilBilgisi.Adresler.Add(yeniAdres);
+
+                // Kaydet
+                Models.VeriYoneticisi.VerileriKaydet(liste);
+
+                return Json(new { success = true });
+            }
+
+            return Json(new { success = false, message = "Oturum hatası." });
+        }
+
+        // Adres Silme (Bonus)
+        [HttpPost]
+        public ActionResult AdresSil(string baslik)
+        {
+            var liste = Models.VeriYoneticisi.VerileriGetir();
+            var aktifKullanici = liste.FirstOrDefault(x => x.KullaniciAdi == User.Identity.Name);
+
+            if (aktifKullanici != null && aktifKullanici.ProfilBilgisi.Adresler != null)
+            {
+                var silinecek = aktifKullanici.ProfilBilgisi.Adresler.FirstOrDefault(x => x.Baslik == baslik);
+                if (silinecek != null)
+                {
+                    aktifKullanici.ProfilBilgisi.Adresler.Remove(silinecek);
+                    Models.VeriYoneticisi.VerileriKaydet(liste);
+                    return Json(new { success = true });
+                }
+            }
+            return Json(new { success = false });
         }
 
         [HttpPost]
@@ -54,41 +107,85 @@ namespace ElektronikSatisProje.Controllers
                 var file = Request.Files[0];
                 if (file != null && file.ContentLength > 0)
                 {
-                    var fileName = "custom_profile_doruk.jpg";
+                    // Dosya işlemleri aynı
+                    var fileName = "profile_" + User.Identity.Name + ".jpg"; // Herkesin resmi kendi adıyla olsun
                     var path = System.IO.Path.Combine(Server.MapPath("~/Content/image"), fileName);
                     file.SaveAs(path);
 
-                    // --- DEĞİŞEN KISIM BURASI ---
-                    // 1. Mevcut veriyi dosyadan çek
-                    var veri = Models.VeriYoneticisi.VeriyiGetir();
+                    // --- VERİ GÜNCELLEME KISMI (ÇOKLU KULLANICI UYUMLU) ---
 
-                    // 2. Resim yolunu güncelle (Browser cache için versiyon ekle)
-                    string yeniYol = "/Content/image/" + fileName + "?v=" + DateTime.Now.Ticks;
-                    veri.ProfilBilgisi.ResimYolu = yeniYol;
+                    // A) Listeyi çek
+                    var liste = Models.VeriYoneticisi.VerileriGetir();
 
-                    // 3. Veriyi tekrar dosyaya kaydet (KALICILIK İŞTE BURADA SAĞLANIYOR)
-                    Models.VeriYoneticisi.VeriyiKaydet(veri);
+                    // B) Giriş yapan kullanıcıyı bul
+                    var aktifKullanici = liste.FirstOrDefault(x => x.KullaniciAdi == User.Identity.Name);
 
-                    return Json(new { success = true, newUrl = yeniYol });
+                    if (aktifKullanici != null)
+                    {
+                        // C) Sadece o kullanıcının resim yolunu güncelle
+                        string yeniYol = "/Content/image/" + fileName + "?v=" + DateTime.Now.Ticks;
+                        aktifKullanici.ProfilBilgisi.ResimYolu = yeniYol;
+
+                        // D) Tüm listeyi tekrar kaydet
+                        Models.VeriYoneticisi.VerileriKaydet(liste);
+
+                        return Json(new { success = true, newUrl = yeniYol });
+                    }
                 }
             }
-            return Json(new { success = false, message = "Dosya yüklenemedi." });
+            return Json(new { success = false, message = "Kullanıcı bulunamadı veya dosya hatası." });
+        }
+
+        // Profil bölümündeki kullanıcı verilerinin kaydı için
+        [HttpPost]
+        public ActionResult ProfilGuncelle(Models.Profil gelenVeri)
+        {
+            // 1. Tüm listeyi çek
+            var liste = Models.VeriYoneticisi.VerileriGetir();
+
+            // 2. Giriş yapan kullanıcıyı bul
+            var aktifKullanici = liste.FirstOrDefault(x => x.KullaniciAdi == User.Identity.Name);
+
+            if (aktifKullanici == null)
+            {
+                return Json(new { success = false, message = "Oturum hatası. Lütfen tekrar giriş yapın." });
+            }
+
+            // 3. Bilgileri Güncelle (Email'i değiştirmiyoruz, o kimliktir)
+            aktifKullanici.ProfilBilgisi.Ad = gelenVeri.Ad;
+            aktifKullanici.ProfilBilgisi.Soyad = gelenVeri.Soyad;
+            aktifKullanici.ProfilBilgisi.Telefon = gelenVeri.Telefon;
+            aktifKullanici.ProfilBilgisi.Sehir = gelenVeri.Sehir;
+            aktifKullanici.ProfilBilgisi.DogumTarihi = gelenVeri.DogumTarihi;
+
+            // 4. Veritabanına (JSON) Kaydet
+            Models.VeriYoneticisi.VerileriKaydet(liste);
+
+            return Json(new { success = true });
         }
 
         [HttpPost]
         public ActionResult ChangePassword(string currentPass, string newPass)
         {
-            var veri = Models.VeriYoneticisi.VeriyiGetir();
+            // A) Listeyi çek
+            var liste = Models.VeriYoneticisi.VerileriGetir();
+
+            // B) Giriş yapan kullanıcıyı bul
+            var aktifKullanici = liste.FirstOrDefault(x => x.KullaniciAdi == User.Identity.Name);
+
+            if (aktifKullanici == null) return Json(new { success = false, message = "Oturum hatası." });
 
             // Eski şifre doğru mu?
-            if (veri.Sifre != currentPass)
+            if (aktifKullanici.Sifre != currentPass)
             {
                 return Json(new { success = false, message = "Mevcut şifreniz hatalı!" });
             }
 
-            // Şifreyi güncelle ve kaydet
-            veri.Sifre = newPass;
-            Models.VeriYoneticisi.VeriyiKaydet(veri);
+            // C) Şifreyi güncelle
+            aktifKullanici.Sifre = newPass;
+
+            // D) Listeyi kaydet
+            Models.VeriYoneticisi.VerileriKaydet(liste);
 
             return Json(new { success = true });
         }
@@ -125,13 +222,26 @@ namespace ElektronikSatisProje.Controllers
 
         public ActionResult UrunDetay(int id)
         {
-            // 1. Tüm ürünleri depodan getir
-            var tumUrunler = UrunDeposu.UrunleriGetir();
+            // 1. Tüm ürünleri çek
+            var tumUrunler = ElektronikSatisProje.Models.UrunDeposu.UrunleriGetir();
 
-            // 2. Gelen ID ile eşleşen ürünü bul (LINQ sorgusu)
+            // 2. Seçilen ürünü bul
             var secilenUrun = tumUrunler.FirstOrDefault(x => x.Id == id);
 
-            // 3. Bulunan ürünü sayfaya gönder
+            if (secilenUrun == null) return RedirectToAction("Index");
+
+            // 3. BENZER ÜRÜNLER ALGORİTMASI (Basit Versiyon)
+            // Mantık: Şu anki ürün HARİÇ, rastgele 4 tane ürün seç.
+            // (Guid.NewGuid() metodu listeyi rastgele karıştırmak için harika bir hiledir)
+            var benzerUrunler = tumUrunler
+                                .Where(x => x.Id != id) // Kendisini hariç tut
+                                .OrderBy(x => Guid.NewGuid()) // Karıştır
+                                .Take(4) // 4 tane al
+                                .ToList();
+
+            // Bu listeyi sayfaya (ViewBag ile) taşıyoruz
+            ViewBag.BenzerUrunler = benzerUrunler;
+
             return View(secilenUrun);
         }
 
@@ -147,60 +257,110 @@ namespace ElektronikSatisProje.Controllers
             return View(hepsi);
         }
 
-        // MESAJ KUTUSU (Inbox)
+        // MESAJ KUTUSU (Inbox) - ARTIK KİŞİYE ÖZEL JSON'DAN OKUYOR
         public ActionResult Mesajlarim()
         {
-            var mesajlar = ElektronikSatisProje.Models.MesajDeposu.MesajlariGetir();
+            // 1. Tüm listeyi çek
+            var liste = Models.VeriYoneticisi.VerileriGetir();
+
+            // 2. Giriş yapan kullanıcıyı bul
+            var aktifKullanici = liste.FirstOrDefault(x => x.KullaniciAdi == User.Identity.Name);
+
+            // 3. Kullanıcının mesajlarını al (Yoksa boş liste gönder)
+            var mesajlar = aktifKullanici != null ? aktifKullanici.Mesajlar : new List<Models.Mesaj>();
+
             return View(mesajlar);
         }
 
-        // MESAJ OKUMA (Detail)
+        // MESAJ OKUMA (Detail) - ARTIK KİŞİYE ÖZEL JSON'DAN BULUYOR
         public ActionResult MesajOku(int id)
         {
-            var mesajlar = ElektronikSatisProje.Models.MesajDeposu.MesajlariGetir();
-            var secilenMesaj = mesajlar.FirstOrDefault(x => x.Id == id);
+            // 1. Tüm listeyi çek
+            var liste = Models.VeriYoneticisi.VerileriGetir();
+
+            // 2. Giriş yapan kullanıcıyı bul
+            var aktifKullanici = liste.FirstOrDefault(x => x.KullaniciAdi == User.Identity.Name);
+
+            if (aktifKullanici == null || aktifKullanici.Mesajlar == null)
+            {
+                return RedirectToAction("Mesajlarim");
+            }
+
+            // 3. Kullanıcının mesajları içinden ID'si tutan mesajı bul
+            var secilenMesaj = aktifKullanici.Mesajlar.FirstOrDefault(x => x.Id == id);
 
             if (secilenMesaj == null) return RedirectToAction("Mesajlarim");
 
             return View(secilenMesaj);
         }
 
+        // 1. BİLGİSAYARLAR
         public ActionResult Bilgisayarlar()
         {
-            // 1. Tüm ürünleri depodan çek
             var tumUrunler = UrunDeposu.UrunleriGetir();
 
-            // 2. Sadece Bilgisayarları (ID'si 1 ve 2 olanları) filtrele
-            // (İleride "Kategori" alanı ekleyince daha kolay olacak, şimdilik ID ile yapıyoruz)
-            var bilgisayarlar = tumUrunler.Where(x => x.Id == 1 || x.Id == 2).ToList();
+            // Formda "Bilgisayar" kategorisi olarak işaretlenen ürünleri Bilgisayarlar kategorisinde sergile
+            var bilgisayarlar = tumUrunler.Where(x => x.Kategori == "Bilgisayar").ToList();
 
-            // 3. Listeyi sayfaya gönder
             return View(bilgisayarlar);
         }
 
-        // 1. CEP TELEFONLARI (ID: 3 ve 4)
+        // 2. CEP TELEFONLARI
         public ActionResult Cep_Telefonları()
         {
             var tumUrunler = UrunDeposu.UrunleriGetir();
-            // UrunDeposu'nda Telefonlara 3 ve 4 vermiştik
-            var telefonlar = tumUrunler.Where(x => x.Id == 3 || x.Id == 4).ToList();
+
+            // Formda "Telefon" kategorisi olarak işaretlenen ürünleri Telefonlar kategorisinde sergile
+            var telefonlar = tumUrunler.Where(x => x.Kategori == "Telefon").ToList();
+
             return View(telefonlar);
         }
 
+        // Formda "Switch" kategorisi olarak işaretlenen ürünleri Switchler kategorisinde sergile
         public ActionResult Switchler()
         {
             var tumUrunler = UrunDeposu.UrunleriGetir();
-            // UrunDeposu'nda Switchlere 5 ve 6 vermiştik
-            var switchler = tumUrunler.Where(x => x.Id == 5 || x.Id == 6).ToList();
+
+            // İsminde Switch, Catalyst veya CloudEngine geçenleri getir
+            var switchler = tumUrunler.Where(x => x.Kategori == "Switch").ToList();
+
             return View(switchler);
         }
 
+        // Formda "Router" kategorisi olarak işaretlenen ürünleri Routerlar kategorisinde sergile
         public ActionResult Routerlar()
         {
             var tumUrunler = UrunDeposu.UrunleriGetir();
-            // UrunDeposu'nda Routerlara 7 ve 8 vermiştik
-            var routerlar = tumUrunler.Where(x => x.Id == 7 || x.Id == 8).ToList();
+
+            // İsminde Router, NetEngine veya ISR geçenleri getir
+            var routerlar = tumUrunler.Where(x =>
+                x.Ad.Contains("Router") ||
+                x.Ad.Contains("NetEngine") ||
+                x.Ad.Contains("ISR")
+            ).ToList();
+
             return View(routerlar);
+        }
+
+        // CANLI ARAMA İÇİN JSON DÖNEN METOT
+        public JsonResult CanliArama(string term)
+        {
+            // 1. Tüm ürünleri depodan çek
+            var tumUrunler = ElektronikSatisProje.Models.UrunDeposu.UrunleriGetir();
+
+            // 2. Arama terimine göre filtrele (Büyük/Küçük harf duyarsız)
+            var sonuclar = tumUrunler.Where(x => x.Ad.ToLower().Contains(term.ToLower())).ToList();
+
+            // 3. Sadece gerekli verileri (Ad, Resim, Fiyat, ID) seçip gönder (Tüm veriyi gönderme, hafif olsun)
+            var sonucListesi = sonuclar.Select(x => new
+            {
+                x.Id,
+                x.Ad,
+                x.ResimYolu,
+                Fiyat = x.Fiyat.ToString("N0") + " TL"
+            });
+
+            return Json(sonucListesi, JsonRequestBehavior.AllowGet);
         }
 
         public ActionResult Sepet()
@@ -218,9 +378,15 @@ namespace ElektronikSatisProje.Controllers
             return View();
         }
 
-        public ActionResult Geçmiş_Siparişlerim()
+        public ActionResult Gecmis_Siparislerim()
         {
-            return View();
+            var liste = Models.VeriYoneticisi.VerileriGetir();
+            var aktifKullanici = liste.FirstOrDefault(x => x.KullaniciAdi == User.Identity.Name);
+
+            // Kullanıcının siparişlerini View'a gönder
+            var siparisler = aktifKullanici != null ? aktifKullanici.Siparisler : new List<Models.Siparis>();
+
+            return View(siparisler);
         }
 
         [HttpGet]
@@ -237,14 +403,19 @@ namespace ElektronikSatisProje.Controllers
         // ÖDEME SAYFASI
         public ActionResult SiparisiTamamla()
         {
-            return View();
+            // Kullanıcının adreslerini sayfaya taşıyoruz
+            var liste = Models.VeriYoneticisi.VerileriGetir();
+            var aktifKullanici = liste.FirstOrDefault(x => x.KullaniciAdi == User.Identity.Name);
+
+            if (aktifKullanici != null)
+            {
+                // Profil bilgisini (içinde adresler var) sayfaya gönder
+                return View(aktifKullanici.ProfilBilgisi);
+            }
+
+            return RedirectToAction("Index");
         }
 
-        // GEÇMİŞ SİPARİŞLERİM (Zaten varsa içini böyle güncelle)
-        public ActionResult Gecmis_Siparislerim()
-        {
-            return View();
-        }
 
         // 2. Kayıt formundaki "Hesap Oluştur" butonuna basıldığında bu metot çalışır ve verileri İŞLER.
         [HttpPost]
@@ -266,11 +437,143 @@ namespace ElektronikSatisProje.Controllers
         }
 
         // ForgotPassword metodu artık sınıfın İÇİNDE ve doğru yerde.
-        
+
         #endregion
 
-        
+        [HttpPost]
+        public ActionResult SiparisKaydet(Models.Siparis yeniSiparis)
+        {
+            // 1. Listeyi Çek
+            var liste = Models.VeriYoneticisi.VerileriGetir();
 
-    } // <-- HomeController SINIFI (CLASS) ARTIK BURADA, DOĞRU YERDE BİTER.
+            // 2. Kullanıcıyı Bul
+            var aktifKullanici = liste.FirstOrDefault(x => x.KullaniciAdi == User.Identity.Name);
 
+            if (aktifKullanici != null)
+            {
+                // 3. Siparişi Ekle (Listeyi başlatmadıysak null olabilir, kontrol et)
+                if (aktifKullanici.Siparisler == null) aktifKullanici.Siparisler = new List<Models.Siparis>();
+
+                aktifKullanici.Siparisler.Insert(0, yeniSiparis); // En başa ekle
+
+                // 4. Kaydet
+                Models.VeriYoneticisi.VerileriKaydet(liste);
+
+                // Ayrıca bir de "Siparişiniz Alındı" mesajı atalım mı? :)
+                if (aktifKullanici.Mesajlar == null) aktifKullanici.Mesajlar = new List<Models.Mesaj>();
+                aktifKullanici.Mesajlar.Insert(0, new Models.Mesaj
+                {
+                    Baslik = "Sipariş Alındı",
+                    Icerik = $"#{yeniSiparis.SiparisNo} nolu siparişiniz hazırlanıyor.",
+                    Zaman = "Şimdi",
+                    RenkClass = "bg-warning",
+                    ResimYolu = "fas fa-box"
+                });
+                Models.VeriYoneticisi.VerileriKaydet(liste); // Tekrar kaydet (Mesaj için)
+
+                return Json(new { success = true });
+            }
+
+            return Json(new { success = false });
+        }
+
+        [HttpPost]
+        public ActionResult FavoriIslemi(int id)
+        {
+            if (!User.Identity.IsAuthenticated)
+                return Json(new { success = false, message = "Lütfen giriş yapınız." });
+
+            var liste = Models.VeriYoneticisi.VerileriGetir();
+            var aktifKullanici = liste.FirstOrDefault(x => x.KullaniciAdi == User.Identity.Name);
+
+            if (aktifKullanici != null)
+            {
+                // Liste null ise başlat
+                if (aktifKullanici.FavoriUrunIdleri == null)
+                    aktifKullanici.FavoriUrunIdleri = new List<int>();
+
+                string islem = "";
+
+                // VARSA SİL, YOKSA EKLE (Toggle)
+                if (aktifKullanici.FavoriUrunIdleri.Contains(id))
+                {
+                    aktifKullanici.FavoriUrunIdleri.Remove(id);
+                    islem = "cikarildi";
+                }
+                else
+                {
+                    aktifKullanici.FavoriUrunIdleri.Add(id);
+                    islem = "eklendi";
+                }
+
+                Models.VeriYoneticisi.VerileriKaydet(liste);
+                return Json(new { success = true, islem = islem });
+            }
+
+            return Json(new { success = false });
+        }
+
+
+
+        // 1. TEK SİPARİŞ SİLME
+        public ActionResult SiparisSil(string siparisNo)
+        {
+            var liste = Models.VeriYoneticisi.VerileriGetir();
+            var aktifKullanici = liste.FirstOrDefault(x => x.KullaniciAdi == User.Identity.Name);
+
+            if (aktifKullanici != null && aktifKullanici.Siparisler != null)
+            {
+                // Sipariş numarasından o siparişi bul ve sil
+                var silinecek = aktifKullanici.Siparisler.FirstOrDefault(x => x.SiparisNo == siparisNo);
+                if (silinecek != null)
+                {
+                    aktifKullanici.Siparisler.Remove(silinecek);
+                    Models.VeriYoneticisi.VerileriKaydet(liste);
+                }
+            }
+            // Sayfayı yenile
+            return RedirectToAction("Gecmis_Siparislerim");
+        }
+
+        // 2. TÜM GEÇMİŞİ TEMİZLEME
+        public ActionResult GecmisiTemizle()
+        {
+            var liste = Models.VeriYoneticisi.VerileriGetir();
+            var aktifKullanici = liste.FirstOrDefault(x => x.KullaniciAdi == User.Identity.Name);
+
+            if (aktifKullanici != null)
+            {
+                // Listeyi tamamen boşalt (Null yapma, new List yap)
+                aktifKullanici.Siparisler = new List<Models.Siparis>();
+                Models.VeriYoneticisi.VerileriKaydet(liste);
+            }
+
+            return RedirectToAction("Gecmis_Siparislerim");
+        }
+
+        // MESAJ SİLME METODU
+        public ActionResult MesajSil(int id)
+        {
+            // 1. Listeyi Çek
+            var liste = Models.VeriYoneticisi.VerileriGetir();
+            var aktifKullanici = liste.FirstOrDefault(x => x.KullaniciAdi == User.Identity.Name);
+
+            // 2. Kullanıcıyı ve Mesajı Bul
+            if (aktifKullanici != null && aktifKullanici.Mesajlar != null)
+            {
+                var silinecek = aktifKullanici.Mesajlar.FirstOrDefault(x => x.Id == id);
+
+                // 3. Varsa Sil ve Kaydet
+                if (silinecek != null)
+                {
+                    aktifKullanici.Mesajlar.Remove(silinecek);
+                    Models.VeriYoneticisi.VerileriKaydet(liste);
+                }
+            }
+
+            // 4. Mesaj Kutusuna Geri Dön
+            return RedirectToAction("Mesajlarim");
+        }
+
+    }  // <-- HomeController sınıfı burada biter.
 } // <-- Namespace burada biter.

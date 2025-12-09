@@ -42,6 +42,10 @@
             /* Kartın arka planını hafif şeffaf beyaz (%90) yapıyoruz */
             background-color: rgb(182, 255, 0, 0.6) !important;
         }
+
+        .registerAndForgot {
+            font-weight:bold
+        }
     </style>
 
 </head>
@@ -73,21 +77,39 @@
                                         <h1 class="h4 text-gray-900 mb-4">Mağazamıza Hoşgeldiniz</h1>
                                     </div>
 
-                                    <form class="user" action="@Url.Action("CheckLogin", "Login")" method="post">
+                                    <form class="user" id="frmLogin">
                                         <div class="form-group">
                                             <input type="text" class="form-control form-control-user"
                                                    id="inpUsername" aria-describedby="emailHelp"
-                                                   placeholder="Email Adresiniz..." name="name">
+                                                   placeholder="Lütfen kullanıcı adını giriniz.." name="name">
                                         </div>
                                         <div class="form-group">
                                             <input type="password" class="form-control form-control-user"
                                                    id="exampleInputPassword" placeholder="Şifreniz" name="password">
                                         </div>
-                                        <button type="submit" class="btn btn-primary btn-user btn-block">
+
+                                        <!-- TİPİ BUTTON OLDU, ONCLICK EKLENDİ -->
+                                        <button type="button" onclick="LoginRequest()" class="btn btn-primary btn-user btn-block">
                                             Giriş Yap
                                         </button>
+
                                         <hr>
+
+                                        <!-- HATA MESAJI ALANI (BAŞLANGIÇTA GİZLİ) -->
+                                        <div id="loginError" class="text-center mt-3" style="display:none; color: #e74a3b; font-size: 0.9rem; font-weight:bold;">
+                                            <!-- Mesaj buraya gelecek -->
+                                        </div>
                                     </form>
+
+                                    <!--Bu blok da şifremi unuttum ve kayıt'ın görsel kodları-->
+                                    <hr>
+                                    <div class="text-center">
+                                        <a class="lead registerAndForgot" href="~/Login/ForgotPassword">Şifremi Unuttum</a>
+                                    </div>
+                                    <div class="text-center">
+                                        <a class="lead registerAndForgot" href="~/Login/Register">Kayıt Ol</a>
+                                    </div>
+
 
                                     <!-- Nav Item - Pages Collapse Menu -->
                                     <!--<li class="nav-item">
@@ -127,6 +149,45 @@
     <script src="~/Content/Templates/Tema/JS/jquery.easing.min.js"></script>
     <script src="~/Content/Templates/Tema/JS/tema-2.js"></script>
 
+    <script>
+    function LoginRequest() {
+        var form = $('#frmLogin');
+        var errorDiv = $('#loginError');
+
+        // Önceki hatayı gizle
+        errorDiv.hide();
+
+        $.ajax({
+            url: '@Url.Action("CheckLogin", "Login")',
+            type: 'POST',
+            data: form.serialize(),
+            success: function (response) {
+                if (response.success) {
+                    // --- BAŞARILI ---
+                    // Anasayfaya yönlendir
+                    window.location.href = '@Url.Action("Index", "Home")';
+                } else {
+                    // --- HATALI ---
+                    // Mesajı yaz ve göster
+                    errorDiv.html(response.message);
+                    errorDiv.fadeIn();
+                }
+            },
+            error: function () {
+                errorDiv.text("Sunucu ile iletişim hatası.");
+                errorDiv.fadeIn();
+            }
+        });
+    }
+
+    // Şifre kutusunda ENTER tuşuna basınca da giriş yapsın
+    document.getElementById("frmLogin").addEventListener("keydown", function(event) {
+        if (event.key === "Enter") {
+            event.preventDefault();
+            LoginRequest();
+        }
+    });
+    </script>
 </body>
 
 </html>

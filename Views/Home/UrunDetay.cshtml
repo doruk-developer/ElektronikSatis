@@ -1,103 +1,231 @@
 ﻿@model ElektronikSatisProje.Models.Urun
 
 @{
-    ViewBag.Title = Model != null ? Model.Ad : "Ürün Detayı";
+    ViewBag.Title = Model.Ad;
     Layout = "~/Views/Shared/_Layout.cshtml";
+
+    // Controller'dan gelen benzer ürünleri alalım
+    var benzerUrunler = ViewBag.BenzerUrunler as List<ElektronikSatisProje.Models.Urun>;
 }
 
-<!-- Eğer model boş gelirse hata vermesin -->
-@if (Model != null)
-{
-    <!-- Yol Haritası -->
-    <nav aria-label="breadcrumb">
-        <ol class="breadcrumb bg-white shadow-sm rounded">
-            <li class="breadcrumb-item"><a href="~/Home/Index">Anasayfa</a></li>
-            <li class="breadcrumb-item active" aria-current="page">@Model.Ad</li>
-        </ol>
-    </nav>
+<!-- ÜST KISIM: ÜRÜN VİTRİNİ -->
+<div class="card shadow-sm border-0 mb-5">
+    <div class="card-body p-4">
+        <div class="row">
 
-    <div class="card shadow mb-4">
-        <div class="card-body">
-            <div class="row">
-
-                <!-- SOL: RESİM -->
-                <div class="col-md-6 d-flex align-items-center justify-content-center border-right">
-                    <div class="position-relative text-center w-100">
-                        <span class="badge @Model.RozetClass position-absolute" style="top:0; left:0; font-size: 1rem;">@Model.Rozet</span>
-                        <!-- Resmi ortala ve sınırla -->
-                        <img src="@Model.ResimYolu" class="img-fluid" style="max-height: 400px; object-fit: contain;" alt="@Model.Ad">
-                    </div>
-                </div>
-
-                <!-- SAĞ: BİLGİLER -->
-                <div class="col-md-6 p-4">
-                    <h3 class="font-weight-bold text-gray-800 mb-2">@Model.Ad</h3>
-                    <div class="mb-3">
-                        <span class="badge badge-warning text-dark"><i class="fas fa-star"></i> 4.9</span>
-                        <span class="text-muted small ml-2">Ürün Kodu: #@Model.Id</span>
-                    </div>
-
-                    <p class="text-gray-600 mb-4" style="font-size: 1.1rem;">
-                        @Model.Aciklama
-                    </p>
-
-                    <h1 class="font-weight-bold text-primary mb-4">@Model.Fiyat.ToString("N0") TL</h1>
-
-                    <!-- Sepete Ekle Butonu -->
-                    <button class="btn btn-success btn-lg btn-block shadow-sm"
-                            onclick="addToCart('@Model.Ad', @((int)Model.Fiyat), '@Model.ResimYolu')">
-                        <i class="fas fa-cart-plus mr-2"></i> Sepete Ekle
-                    </button>
-
-                    <!-- Güvenlik İkonları -->
-                    <div class="row text-center mt-5 pt-3 border-top">
-                        <div class="col-4">
-                            <i class="fas fa-truck fa-2x text-gray-400 mb-2"></i>
-                            <p class="small mb-0">Hızlı Kargo</p>
-                        </div>
-                        <div class="col-4">
-                            <i class="fas fa-shield-alt fa-2x text-gray-400 mb-2"></i>
-                            <p class="small mb-0">2 Yıl Garanti</p>
-                        </div>
-                        <div class="col-4">
-                            <i class="fas fa-undo fa-2x text-gray-400 mb-2"></i>
-                            <p class="small mb-0">Kolay İade</p>
-                        </div>
-                    </div>
-                </div>
+            <!-- SOL: ÜRÜN RESMİ -->
+            <div class="col-md-5 d-flex align-items-center justify-content-center bg-light rounded" style="min-height: 400px;">
+                <img src="@Model.ResimYolu" class="img-fluid product-detail-img" alt="@Model.Ad"
+                     onerror="this.onerror=null; this.src='/Content/image/default.jpg';">
             </div>
 
-            <hr class="my-5">
+            <!-- SAĞ: BİLGİLER -->
+            <div class="col-md-7 pl-md-5 mt-4 mt-md-0">
+                <span class="badge badge-primary px-3 py-2 mb-2">Stokta Var</span>
+                <h2 class="font-weight-bold text-dark mb-2">@Model.Ad</h2>
 
-            <!-- TABLO: TEKNİK ÖZELLİKLER -->
-            <div class="row">
-                <div class="col-12">
-                    <h4 class="font-weight-bold text-gray-800 mb-4">Teknik Özellikler</h4>
-                    @if (Model.TeknikOzellikler != null && Model.TeknikOzellikler.Count > 0)
-                    {
+                <!-- Yıldızlar (Görsel) -->
+                <div class="mb-3 text-warning small">
+                    <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star-half-alt"></i>
+                    <span class="text-muted ml-2">(4.8 / 5 Puan - 24 Değerlendirme)</span>
+                </div>
+
+                <h1 class="text-primary font-weight-bold mb-4">@Model.Fiyat.ToString("N0") TL</h1>
+
+                <!-- YENİ HALİ: Sadece Teknik Özellikler (Madde İşaretli) -->
+                <div class="mb-4">
+                    <h6 class="font-weight-bold text-dark mb-3">Öne Çıkan Özellikler:</h6>
+                    <ul class="list-unstyled">
+                        @if (Model.TeknikOzellikler != null)
+                        {
+                            // Sadece ilk 5 özelliği getir ki çok uzamasın
+                            foreach (var ozellik in Model.TeknikOzellikler.Take(5))
+                            {
+                                <li class="mb-2 d-flex align-items-center">
+                                    <i class="fas fa-check text-success mr-2"></i>
+                                    <span class="text-muted mr-1">@ozellik.Key:</span>
+                                    <span class="font-weight-bold text-dark">@ozellik.Value</span>
+                                </li>
+                            }
+                        }
+                    </ul>
+                </div>
+
+                <!-- Sepet Butonu -->
+                <div class="d-flex align-items-center">
+                    <div class="input-group mr-3" style="width: 130px;">
+                        <div class="input-group-prepend">
+                            <button class="btn btn-outline-secondary" type="button" onclick="changeDetailQty(-1)">-</button>
+                        </div>
+                        <input type="text" id="detailQty" class="form-control text-center font-weight-bold" value="1" readonly>
+                        <div class="input-group-append">
+                            <button class="btn btn-outline-secondary" type="button" onclick="changeDetailQty(1)">+</button>
+                        </div>
+                    </div>
+                    <button class="btn btn-primary btn-lg px-5 shadow-sm btn-add-detail" onclick="addToCartDetail()">
+                        <i class="fas fa-shopping-cart mr-2"></i> Sepete Ekle
+                    </button>
+                </div>
+
+                <hr class="my-4">
+
+                <div class="small text-muted">
+                    <i class="fas fa-truck mr-2"></i> 24 Saatte Kargoda <br>
+                    <i class="fas fa-shield-alt mr-2"></i> 2 Yıl Resmi Distribütör Garantili
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ORTA KISIM: TAB MENÜ (AÇIKLAMA VE YORUMLAR) -->
+<div class="row mb-5">
+    <div class="col-12">
+        <div class="card shadow-sm border-0">
+            <div class="card-header bg-white border-bottom-0">
+                <ul class="nav nav-tabs card-header-tabs" id="productTabs" role="tablist">
+                    <li class="nav-item">
+                        <a class="nav-link active font-weight-bold" id="desc-tab" data-toggle="tab" href="#desc" role="tab">Ürün Açıklaması</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link font-weight-bold" id="comments-tab" data-toggle="tab" href="#comments" role="tab">Yorumlar (3)</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link font-weight-bold" id="specs-tab" data-toggle="tab" href="#specs" role="tab">Teknik Özellikler</a>
+                    </li>
+                </ul>
+            </div>
+            <div class="card-body">
+                <div class="tab-content" id="productTabsContent">
+
+                    <!-- 1. Açıklama Tabı -->
+                    <div class="tab-pane fade show active" id="desc" role="tabpanel">
+                        <h5 class="font-weight-bold">Ürün Hakkında</h5>
+                        <p>@Model.Aciklama</p>
+                    </div>
+
+                    <!-- 2. Yorumlar Tabı (Statik Tasarım) -->
+                    <div class="tab-pane fade" id="comments" role="tabpanel">
+                        <div class="mb-4 border-bottom pb-3">
+                            <div class="d-flex align-items-center mb-1">
+                                <strong class="mr-2">Ali Veli</strong>
+                                <span class="text-warning small"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></span>
+                            </div>
+                            <p class="text-muted mb-0">Ürün harika, kargo çok hızlıydı. Kesinlikle tavsiye ederim.</p>
+                        </div>
+                        <div class="mb-4 border-bottom pb-3">
+                            <div class="d-flex align-items-center mb-1">
+                                <strong class="mr-2">Ayşe Yılmaz</strong>
+                                <span class="text-warning small"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="far fa-star"></i></span>
+                            </div>
+                            <p class="text-muted mb-0">Fiyat performans ürünü. Paketleme çok özenliydi.</p>
+                        </div>
+
+                        <!-- Yorum Yap Butonu -->
+                        <button class="btn btn-outline-primary btn-sm" onclick="alert('Yorum yapabilmek için bu ürünü satın almış olmalısınız.')">Yorum Yap</button>
+                    </div>
+
+                    <!-- 3. Özellikler Tabı -->
+                    <div class="tab-pane fade" id="specs" role="tabpanel">
                         <table class="table table-striped table-bordered">
                             <tbody>
-                                @foreach (var ozellik in Model.TeknikOzellikler)
+                                @if (Model.TeknikOzellikler != null)
                                 {
-                                    <tr>
-                                        <th style="width: 30%; background-color: #f8f9fc;">@ozellik.Key</th>
-                                        <td>@ozellik.Value</td>
-                                    </tr>
+                                    foreach (var item in Model.TeknikOzellikler)
+                                    {
+                                        <tr>
+                                            <th style="width: 30%;">@item.Key</th>
+                                            <td>@item.Value</td>
+                                        </tr>
+                                    }
                                 }
                             </tbody>
                         </table>
-                    }
-                    else
-                    {
-                        <div class="alert alert-warning">Teknik özellik bilgisi girilmemiş.</div>
-                    }
+                    </div>
+
                 </div>
             </div>
         </div>
     </div>
-}
-else
-{
-    <div class="alert alert-danger">Ürün bulunamadı!</div>
-}
+</div>
 
+<!-- ALT KISIM: BENZER ÜRÜNLER (Controller'dan Gelen Veri) -->
+<h4 class="font-weight-bold text-gray-800 mb-4">Bunları da Beğenebilirsiniz</h4>
+<div class="row">
+    @if (benzerUrunler != null)
+    {
+        foreach (var urun in benzerUrunler)
+        {
+            <div class="col-6 col-md-3 mb-4">
+                <div class="card shadow-sm border-0 h-100 product-card">
+                    <div class="card-body text-center d-flex flex-column align-items-center">
+                        <a href="@Url.Action("UrunDetay", "Home", new { id = urun.Id })" class="d-block mb-3">
+                            <img src="@urun.ResimYolu" class="img-fluid" style="height: 120px; object-fit: contain;">
+                        </a>
+                        <h6 class="font-weight-bold text-truncate w-100"><a href="@Url.Action("UrunDetay", "Home", new { id = urun.Id })" class="text-dark">@urun.Ad</a></h6>
+                        <span class="text-primary font-weight-bold">@urun.Fiyat.ToString("N0") TL</span>
+                    </div>
+                </div>
+            </div>
+        }
+    }
+</div>
+
+<!-- CSS -->
+<style>
+    .product-detail-img {
+        max-height: 350px;
+        transition: transform 0.3s;
+    }
+
+        .product-detail-img:hover {
+            transform: scale(1.1);
+        }
+
+    .nav-tabs .nav-link.active {
+        color: #4e73df;
+        border-top: 3px solid #4e73df;
+    }
+
+    .nav-tabs .nav-link {
+        color: #858796;
+    }
+
+    .btn-add-detail {
+        border-radius: 50px;
+        transition: all 0.3s;
+    }
+
+        .btn-add-detail:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(78, 115, 223, 0.4);
+        }
+</style>
+
+<!-- SCRIPT -->
+<script>
+    // Adet Artır/Azalt
+    function changeDetailQty(change) {
+        var input = document.getElementById('detailQty');
+        var val = parseInt(input.value) || 1;
+        val += change;
+        if(val < 1) val = 1;
+        input.value = val;
+    }
+
+    // Sepete Ekle (Adetli)
+    function addToCartDetail() {
+        var qty = parseInt(document.getElementById('detailQty').value) || 1;
+
+        // Mevcut addToCart fonksiyonunu döngüye sokarak veya adet parametresi ekleyerek kullanabiliriz.
+        // Ama şimdilik basitçe döngüyle ekleyelim (Layout'taki fonksiyonu kullanıyoruz)
+
+        for(var i=0; i<qty; i++) {
+            addToCart('@Model.Ad', @((int)Model.Fiyat), '@Model.ResimYolu');
+        }
+
+        // Tek seferde bildirim geçmek daha şık olurdu ama şimdilik bu iş görür.
+        // (İleride addToCart fonksiyonuna 'quantity' parametresi ekleyerek geliştirebiliriz)
+    }
+</script>

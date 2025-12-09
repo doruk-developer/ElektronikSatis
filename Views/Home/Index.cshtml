@@ -5,150 +5,307 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<!-- 1. BÖLÜM: ANA KAMPANYA SLIDER'I (Sabit Görseller) -->
-<div id="kampanyaCarousel" class="carousel slide mb-5 shadow rounded overflow-hidden" data-ride="carousel">
+<!-- 1. BÖLÜM: SLIDER -->
+<div id="kampanyaCarousel" class="carousel slide mb-5 shadow-lg rounded overflow-hidden" data-ride="carousel">
     <ol class="carousel-indicators">
         <li data-target="#kampanyaCarousel" data-slide-to="0" class="active"></li>
         <li data-target="#kampanyaCarousel" data-slide-to="1"></li>
         <li data-target="#kampanyaCarousel" data-slide-to="2"></li>
     </ol>
     <div class="carousel-inner">
-        <!-- Slide 1 -->
-        <div class="carousel-item active" style="height: 400px; background-color: #4e73df;">
+        <div class="carousel-item active" style="height: 350px; background: linear-gradient(45deg, #4e73df, #224abe);">
             <div class="d-flex h-100 align-items-center justify-content-center text-white flex-column">
-                <h1 class="display-4 font-weight-bold">EFSANE KASIM İNDİRİMLERİ</h1>
-                <p class="lead">Seçili laptoplarda %20'ye varan indirimler!</p>
-                <a href="~/Home/Bilgisayarlar" class="btn btn-light btn-lg font-weight-bold text-primary">Alışverişe Başla</a>
+                <h1 class="display-4 font-weight-bold">EFSANE İNDİRİMLER</h1>
+                <p class="lead">Teknolojide fırsat günleri başladı.</p>
+                <a href="#urunListesiBolumu" class="btn btn-light btn-lg font-weight-bold text-primary mt-3">Alışverişe Başla</a>
             </div>
         </div>
-        <!-- Slide 2 -->
-        <div class="carousel-item" style="height: 400px; background-color: #1cc88a;">
+        <div class="carousel-item" style="height: 350px; background: linear-gradient(45deg, #1cc88a, #13855c);">
             <div class="d-flex h-100 align-items-center justify-content-center text-white flex-column">
                 <h1 class="display-4 font-weight-bold">YENİ NESİL TELEFONLAR</h1>
-                <p class="lead">Teknolojiyi cebinizde taşıyın.</p>
-                <a href="~/Home/Cep_Telefonları" class="btn btn-light btn-lg font-weight-bold text-success">İncele</a>
+                <p class="lead">Dünyayla bağlantınızı koparmayın.</p>
             </div>
         </div>
-        <!-- Slide 3 -->
-        <div class="carousel-item" style="height: 400px; background-color: #36b9cc;">
+        <div class="carousel-item" style="height: 350px; background: linear-gradient(45deg, #36b9cc, #258391);">
             <div class="d-flex h-100 align-items-center justify-content-center text-white flex-column">
                 <h1 class="display-4 font-weight-bold">ENDÜSTRİYEL ÇÖZÜMLER</h1>
-                <p class="lead">İş yeriniz için en güçlü Router ve Switchler.</p>
-                <a href="~/Home/Switchler" class="btn btn-light btn-lg font-weight-bold text-info">Keşfet</a>
+                <p class="lead">İş yeriniz için profesyonel altyapı.</p>
             </div>
         </div>
     </div>
     <a class="carousel-control-prev" href="#kampanyaCarousel" role="button" data-slide="prev">
         <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-        <span class="sr-only">Previous</span>
     </a>
     <a class="carousel-control-next" href="#kampanyaCarousel" role="button" data-slide="next">
         <span class="carousel-control-next-icon" aria-hidden="true"></span>
-        <span class="sr-only">Next</span>
     </a>
 </div>
 
-<!-- 2. BÖLÜM: GÜNÜN FIRSATLARI BAŞLIĞI -->
-<div class="d-sm-flex align-items-center justify-content-between mb-4">
-    <h1 class="h3 mb-0 text-gray-800 font-weight-bold">🔥 Günün Fırsatları (En Uygun Fiyatlar)</h1>
-    <a href="@Url.Action("TumUrunler", "Home")" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm">
-        <i class="fas fa-arrow-right fa-sm text-white-50"></i> Tümünü Gör
-    </a>
-</div>
+<!-- 2. BÖLÜM: FİLTRE VE ÜRÜNLER -->
+<div class="row" id="urunListesiBolumu">
 
-<!-- 3. BÖLÜM: OTOMATİK KAYDIRMALI ÜRÜN LİSTESİ -->
-<!-- Depodan gelen veriler burada listelenir -->
-<div class="scrolling-wrapper row flex-row flex-nowrap mt-4 pb-4 pt-2">
+    <!-- SOL KOLON: FİLTRE PANELİ -->
+    <div class="col-lg-3 mb-4">
+        <div class="card shadow-sm border-0 sticky-top" style="top: 100px; z-index: 1;">
+            <div class="card-header bg-white border-bottom-0 pt-4 pb-0">
+                <h5 class="font-weight-bold text-gray-800"><i class="fas fa-filter mr-2 text-primary"></i> Filtrele</h5>
+            </div>
+            <div class="card-body">
 
-    @if (Model != null)
-    {
-        foreach (var urun in Model)
-        {
-            // MATEMATİK: Fiyatı %20 artırıp "Eski Fiyat" süsü veriyoruz
-            var fakeEskiFiyat = urun.Fiyat * 1.20m;
+                <!-- Kategori Filtresi -->
+                <h6 class="font-weight-bold text-dark mt-2">Kategoriler</h6>
 
-            <div class="col-10 col-sm-6 col-md-4 col-lg-3">
-                <div class="card shadow h-100 product-card border-left-danger">
+                <!-- Tümünü Seç -->
+                <div class="custom-control custom-checkbox mb-2 pb-2 border-bottom">
+                    <input type="checkbox" class="custom-control-input" id="checkAll" checked onchange="toggleAllCategories(this)">
+                    <label class="custom-control-label font-weight-bold text-primary" for="checkAll">Tüm Ürünler</label>
+                </div>
 
-                    <!-- İndirim Rozeti (Nabız Efektiyle) -->
-                    <div class="badge-overlay">
-                        <span class="badge badge-danger px-3 py-2 animate-pulse">%20 İNDİRİM</span>
-                    </div>
+                <div class="custom-control custom-checkbox mb-2 mt-2">
+                    <input type="checkbox" class="custom-control-input filter-check" id="cat1" value="Bilgisayar" checked>
+                    <label class="custom-control-label" for="cat1">Bilgisayarlar</label>
+                </div>
+                <div class="custom-control custom-checkbox mb-2">
+                    <input type="checkbox" class="custom-control-input filter-check" id="cat2" value="Telefon" checked>
+                    <label class="custom-control-label" for="cat2">Telefonlar</label>
+                </div>
+                <div class="custom-control custom-checkbox mb-2">
+                    <input type="checkbox" class="custom-control-input filter-check" id="cat3" value="Switch" checked>
+                    <label class="custom-control-label" for="cat3">Switchler</label>
+                </div>
+                <div class="custom-control custom-checkbox mb-2">
+                    <input type="checkbox" class="custom-control-input filter-check" id="cat4" value="Router" checked>
+                    <label class="custom-control-label" for="cat4">Routerlar</label>
+                </div>
 
-                    <div class="img-container p-3">
-                        <img src="@urun.ResimYolu" class="card-img-top product-img" alt="@urun.Ad">
-                    </div>
+                <hr>
 
-                    <div class="card-body d-flex flex-column p-3">
-                        <h6 class="card-title font-weight-bold text-dark text-truncate" title="@urun.Ad">
-                            @urun.Ad
-                        </h6>
+                <!-- Fiyat Filtresi -->
+                <h6 class="font-weight-bold text-dark">Fiyat Aralığı</h6>
+                <div class="form-group">
+                    <label class="small text-muted mb-1">Maksimum Bütçe:</label>
 
-                        <div class="mt-auto">
-                            <!-- Çizili Eski Fiyat (Kırmızı) -->
-                            <div class="text-gray-500 small" style="text-decoration: line-through; color: #e74a3b !important;">
-                                @fakeEskiFiyat.ToString("N0") TL
-                            </div>
-
-                            <!-- Gerçek Fiyat (Yeşil ve Büyük) -->
-                            <h4 class="font-weight-bold text-success mb-3">
-                                @urun.Fiyat.ToString("N0") TL
-                            </h4>
-
-                            <!-- Sepete Ekle Butonu -->
-                            <button class="btn btn-outline-danger btn-block btn-sm"
-                                    onclick="addToCart('@urun.Ad', @((int)urun.Fiyat), '@urun.ResimYolu')">
-                                Hemen Al
+                    <!-- Input ve Onay Butonu -->
+                    <div class="input-group mb-2">
+                        <input type="number" id="priceInput" class="form-control form-control-sm font-weight-bold text-primary"
+                               value="50000" min="0" step="100" placeholder="Tutar girin">
+                        <div class="input-group-append">
+                            <button class="btn btn-sm btn-primary" type="button" onclick="manualPriceUpdate()">
+                                <i class="fas fa-check"></i>
                             </button>
                         </div>
                     </div>
+
+                    <!-- Kaydırma Çubuğu -->
+                    <!-- oninput="sliderMoved()": Sadece çubukla oynayınca çalışır -->
+                    <input type="range" class="custom-range" id="priceRange" min="0" max="50000" step="500" value="50000" oninput="sliderMoved()">
+
+                    <div class="d-flex justify-content-between mt-1">
+                        <small class="text-muted">0 TL</small>
+                        <!-- Sağ Tavan Fiyatı (Dinamik) -->
+                        <small class="text-muted font-weight-bold" id="sliderMaxLabel">50.000 TL</small>
+                    </div>
                 </div>
+
             </div>
-        }
-    }
-    else
-    {
-        <div class="col-12 text-center text-danger">
-            <p>Ürünler yüklenirken bir hata oluştu veya liste boş.</p>
         </div>
-    }
+    </div>
+
+    <!-- SAĞ KOLON: ÜRÜNLER -->
+    <div class="col-lg-9">
+
+        <div class="d-flex align-items-center justify-content-between mb-4">
+            <h4 class="text-gray-800 font-weight-bold mb-0">Tüm Ürünler</h4>
+            <span class="badge badge-primary px-3 py-2" id="productCountBadge" style="font-size: 0.9rem;">
+                Listelenen: @Model.Count() ürün
+            </span>
+        </div>
+
+        <div class="row" id="productsContainer">
+            @if (Model != null)
+            {
+                foreach (var urun in Model)
+                {
+                    // Artık tahmin etmiyoruz, veriden okuyoruz!
+                    string kategori = urun.Kategori ?? "Diğer";
+
+                    <div class="col-lg-4 ... product-item"
+                         data-category="@kategori"
+                         data-price="@urun.Fiyat">
+
+                        <div class="card shadow-sm h-100 product-card">
+                            <!-- İndirim Rozeti -->
+                            <div class="badge-overlay">
+                                <span class="discount-tag">@urun.Rozet</span>
+                            </div>
+
+                            <div class="card shadow-sm h-100 product-card">
+
+                                <!-- İndirim Rozeti (Zaten Vardı) -->
+                                <div class="badge-overlay">...</div>
+
+                                <!-- YENİ EKLENEN: KALP İKONU -->
+                                <!-- onclick eventi ile toggleFav fonksiyonunu çağırıyoruz -->
+                                <button class="btn-fav" onclick="toggleFav(@urun.Id, this)" title="Favorilere Ekle">
+                                    <i class="fas fa-heart"></i>
+                                </button>
+
+                                <!-- TIKLANABİLİR ALAN (Detay Sayfasına Gider) -->
+                                <a href="@Url.Action("UrunDetay", "Home", new { id = urun.Id })" class="text-decoration-none text-dark">
+                                    <div class="img-container">
+                                        <img src="@urun.ResimYolu" class="product-img" alt="@urun.Ad"
+                                             onerror="this.onerror=null; this.src='/Content/image/default.jpg';">
+                                    </div>
+
+                                    <div class="card-body d-flex flex-column pb-0">
+                                        <h6 class="card-title font-weight-bold text-truncate" title="@urun.Ad">
+                                            @urun.Ad
+                                        </h6>
+                                    </div>
+                                </a>
+
+                                <!-- AKSİYON ALANI (Sadece Sepet Butonu) -->
+                                <div class="card-body pt-0 mt-auto">
+                                    <div class="d-flex justify-content-between align-items-center mb-3">
+                                        <span class="text-muted small text-decoration-line-through">@((urun.Fiyat * 1.2m).ToString("N0")) TL</span>
+                                        <span class="price-tag">@urun.Fiyat.ToString("N0") TL</span>
+                                    </div>
+
+                                    <button class="btn-add-cart w-100 btn-sm" onclick="addToCart('@urun.Ad', @((int)urun.Fiyat), '@urun.ResimYolu')">
+                                        <i class="fas fa-shopping-cart mr-2"></i> Sepete Ekle
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        
+                    </div>  
+                }
+
+            }
+        </div>
+    </div>
 
 </div>
 
-<!-- Sadece Bu Sayfaya Özel CSS -->
+<!-- CSS (Tasarım) -->
 <style>
-    /* Yatay Kaydırma (Netflix Tarzı) */
-    .scrolling-wrapper {
-        overflow-x: auto;
-        overflow-y: hidden;
-        white-space: nowrap;
-        -webkit-overflow-scrolling: touch; /* Mobilde akıcılık */
-        padding-bottom: 10px;
+    /* Sadece Index Sayfasına Özel Slider ve Filtre Ayarları */
+
+    .carousel-item {
+        /* Slider'ın yüksekliği ve geçişleri */
+        transition: transform .6s ease-in-out;
     }
 
-    /* Scrollbar Tasarımı */
-    .scrolling-wrapper::-webkit-scrollbar { height: 8px; }
-    .scrolling-wrapper::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 10px; }
-    .scrolling-wrapper::-webkit-scrollbar-thumb { background: #ccc; border-radius: 10px; }
-    .scrolling-wrapper::-webkit-scrollbar-thumb:hover { background: #888; }
-
-    /* Kart Tasarımı */
-    .product-card { transition: transform 0.2s; border: none; white-space: normal; }
-    .product-card:hover { transform: scale(1.03); }
-
-    .img-container {
-        height: 180px;
-        display: flex; align-items: center; justify-content: center; background-color: #fff;
+    /* Filtre Panelindeki Checkbox Özelleştirmeleri (Varsa) */
+    .custom-control-label {
+        cursor: pointer;
     }
-    .product-img { max-height: 100%; max-width: 100%; object-fit: contain; }
-
-    .badge-overlay { position: absolute; top: 10px; left: 10px; z-index: 5; }
-
-    /* Nabız Efekti (İndirim Yazısı İçin) */
-    @@keyframes pulse {
-        0% { transform: scale(1); }
-        50% { transform: scale(1.1); }
-        100% { transform: scale(1); }
-    }
-    .animate-pulse { animation: pulse 1.5s infinite; }
 </style>
+
+<!-- JAVASCRIPT (Mantık) -->
+<script>
+    // SweetAlert
+    const Toast = Swal.mixin({
+        toast: true, position: 'top-end', showConfirmButton: false,
+        timer: 3000, timerProgressBar: true,
+        didOpen: (toast) => {
+            toast.addEventListener('mouseenter', Swal.stopTimer);
+            toast.addEventListener('mouseleave', Swal.resumeTimer);
+        }
+    });
+
+    function showNotification(icon, message) {
+        Toast.fire({ icon: icon, title: message });
+    }
+
+    document.addEventListener("DOMContentLoaded", function () {
+        var checkboxes = document.querySelectorAll('.filter-check');
+        checkboxes.forEach(function (box) {
+            box.addEventListener('change', function () {
+                if (!this.checked) document.getElementById('checkAll').checked = false;
+                filterProducts();
+            });
+        });
+
+        // Enter tuşu desteği
+        document.getElementById("priceInput").addEventListener("keypress", function (event) {
+            if (event.key === "Enter") manualPriceUpdate();
+        });
+    });
+
+    // --- KATEGORİ ---
+    function toggleAllCategories(source) {
+        var checkboxes = document.querySelectorAll('.filter-check');
+        checkboxes.forEach(function (box) {
+            box.checked = source.checked;
+        });
+        filterProducts();
+    }
+
+    // --- FİYAT FONKSİYONLARI ---
+
+    // 1. Çubuğu Kaydırınca -> Kutuyu Güncelle
+    function sliderMoved() {
+        var range = document.getElementById('priceRange');
+        var input = document.getElementById('priceInput');
+        input.value = range.value;
+        filterProducts();
+    }
+
+    // 2. Kutuya Yazıp Onaylayınca -> Çubuğu ve Sınırı Güncelle
+    function manualPriceUpdate() {
+        var range = document.getElementById('priceRange');
+        var input = document.getElementById('priceInput');
+        var maxLabel = document.getElementById('sliderMaxLabel');
+
+        var girilenDeger = parseFloat(input.value) || 0;
+        var yeniLimit = Math.max(girilenDeger, 1000); // En az 1000 olsun
+
+        // Çubuğun tavanını kullanıcının girdiği sayı yap
+        range.max = yeniLimit;
+        // Çubuğu o sayıya çek (En sağa)
+        range.value = girilenDeger;
+
+        // Sağ alttaki yazıyı güncelle
+        maxLabel.innerText = formatMoney(yeniLimit) + " TL";
+
+        filterProducts();
+    }
+
+    // --- FİLTRELEME ---
+    function filterProducts() {
+        var selectedCategories = [];
+        document.querySelectorAll('.filter-check:checked').forEach(function (box) {
+            selectedCategories.push(box.value);
+        });
+
+        // Fiyatı o an ÇUBUK nerede duruyorsa oradan al
+        var maxPrice = parseFloat(document.getElementById('priceRange').value) || 0;
+
+        var products = document.querySelectorAll('.product-item');
+        var visibleCount = 0;
+
+        products.forEach(function (product) {
+            var productCategory = product.getAttribute('data-category');
+            var productPrice = parseFloat(product.getAttribute('data-price'));
+
+            var categoryMatch = selectedCategories.includes(productCategory);
+            var priceMatch = productPrice <= maxPrice;
+
+            if (categoryMatch && priceMatch) {
+                product.style.display = 'block';
+                product.style.opacity = '1';
+                visibleCount++;
+            } else {
+                product.style.display = 'none';
+            }
+        });
+
+        document.getElementById('productCountBadge').innerText = "Listelenen: " + visibleCount + " ürün";
+    }
+
+    function formatMoney(amount) {
+        return amount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+    }
+</script>

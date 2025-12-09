@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
+﻿using System.Collections.Generic;
 
 namespace ElektronikSatisProje.Models
 {
@@ -18,6 +15,7 @@ namespace ElektronikSatisProje.Models
 
         // --- Ürün Özellikleri için Eklenen Kısım ---
         public string Aciklama { get; set; } // Uzun yazı
+        public string Kategori { get; set; }  // Ürün ekleme formunda kategori seçimi için
         public Dictionary<string, string> TeknikOzellikler { get; set; } // Tablo için (Örn: İşlemci -> i5)
     }
 }

@@ -78,44 +78,43 @@
     </div>
 </div>
 
-<!-- Bu Sayfaya Özel Scriptler -->
+<!-- Sepette, kişiye özel siparişleri tutan script -->
 <script>
+    // --- KİŞİYE ÖZEL ANAHTAR TANIMI ---
+    var activeUser = '@User.Identity.Name';
+    var cartKey = 'cart_' + activeUser;
+    // ----------------------------------
+
     document.addEventListener("DOMContentLoaded", function () {
         renderCartPage();
     });
 
     function renderCartPage() {
-        // Hafızadaki sepeti çek
-        var cart = JSON.parse(localStorage.getItem('myShoppingCart')) || [];
+        // ARTIK DİNAMİK ANAHTARDAN OKUYORUZ
+        var cart = JSON.parse(localStorage.getItem(cartKey)) || [];
         var tableBody = document.getElementById('cartTableBody');
 
-        // Tabloyu temizle
         tableBody.innerHTML = "";
         var totalPrice = 0;
 
-        // Eğer sepet boşsa
         if (cart.length === 0) {
-            document.getElementById('emptyCartMessage').style.display = 'block'; // Boş uyarısını göster
-            document.querySelector('.table-responsive').style.display = 'none'; // Tabloyu gizle
+            document.getElementById('emptyCartMessage').style.display = 'block';
+            document.querySelector('.table-responsive').style.display = 'none';
             updateTotals(0);
             return;
         }
 
-        // Sepet doluysa tabloyu göster, uyarıyı gizle
         document.getElementById('emptyCartMessage').style.display = 'none';
         document.querySelector('.table-responsive').style.display = 'block';
 
-        // Her ürün için satır oluştur
         cart.forEach(function (item, index) {
             var rowTotal = item.price * item.quantity;
             totalPrice += rowTotal;
 
-            // Dark Mode için yazı rengi ayarı (Bootstrap class'ı)
-            // Not: Resim yolunu kontrol ediyoruz, eğer resim yoksa varsayılan ikon çıksın
             var imgPath = item.image ? item.image : '/Content/image/sembol_sepet.png';
 
             var row = `
-                <tr class="bg-white text-dark"> <!-- Satır arka planı beyaz, yazı siyah olsun -->
+                <tr class="bg-white text-dark">
                     <td class="text-center">
                         <img src="${imgPath}" style="width: 60px; height: 60px; object-fit: contain; border: 1px solid #ddd; border-radius: 5px;">
                     </td>
@@ -146,29 +145,32 @@
         updateTotals(totalPrice);
     }
 
-    // Adet Değiştirme
     function changeQty(index, change) {
-        var cart = JSON.parse(localStorage.getItem('myShoppingCart')) || [];
+        var cart = JSON.parse(localStorage.getItem(cartKey)) || [];
         cart[index].quantity += change;
-        if (cart[index].quantity <= 0) cart.splice(index, 1); // 0'a düşerse sil
-        localStorage.setItem('myShoppingCart', JSON.stringify(cart));
-        renderCartPage();
-        if (window.calculateCartTotal) window.calculateCartTotal(); // Layout sayacını güncelle
-    }
+        if (cart[index].quantity <= 0) cart.splice(index, 1);
 
-    // Ürün Silme
-    function removeItem(index) {
-        var cart = JSON.parse(localStorage.getItem('myShoppingCart')) || [];
-        cart.splice(index, 1);
-        localStorage.setItem('myShoppingCart', JSON.stringify(cart));
+        // GÜNCEL HALİNİ KİŞİYE ÖZEL KAYDET
+        localStorage.setItem(cartKey, JSON.stringify(cart));
+
         renderCartPage();
         if (window.calculateCartTotal) window.calculateCartTotal();
     }
 
-    // Sepeti Boşalt
+    function removeItem(index) {
+        var cart = JSON.parse(localStorage.getItem(cartKey)) || [];
+        cart.splice(index, 1);
+
+        // SİLİNCE DE KİŞİYE ÖZEL KAYDET
+        localStorage.setItem(cartKey, JSON.stringify(cart));
+
+        renderCartPage();
+        if (window.calculateCartTotal) window.calculateCartTotal();
+    }
+
     function clearCart() {
         if (confirm("Sepet temizlensin mi?")) {
-            localStorage.removeItem('myShoppingCart');
+            localStorage.removeItem(cartKey); // SADECE KENDİ SEPETİNİ SİL
             renderCartPage();
             if (window.calculateCartTotal) window.calculateCartTotal();
         }

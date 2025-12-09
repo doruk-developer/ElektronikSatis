@@ -1,7 +1,7 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
+using ElektronikSatisProje.Helpers;
+using ElektronikSatisProje.Interfaces;
+using ElektronikSatisProje.Services;
+using Microsoft.Extensions.DependencyInjection;
 using System.Web.Mvc;
 using System.Web.Routing;
 
@@ -11,6 +11,18 @@ namespace ElektronikSatisProje
     {
         protected void Application_Start()
         {
+            var services = new ServiceCollection();
+
+            // Servisleri kaydet
+            services.AddScoped<ILoginService, LoginService>();
+
+            // Controller'larý kaydet (ÖNEMLÝ!)
+            services.AddControllersAsServices(typeof(MvcApplication).Assembly);
+
+            var serviceProvider = services.BuildServiceProvider();
+
+            DependencyResolver.SetResolver(new DefaultDependencyResolver(serviceProvider));
+
 
             GlobalFilters.Filters.Add(new AuthorizeAttribute());
             AreaRegistration.RegisterAllAreas();

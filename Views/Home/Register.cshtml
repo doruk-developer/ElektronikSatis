@@ -88,10 +88,50 @@
     </div>
 
     <!-- NOT: Bu JS linklerinin yollarının projenizle uyumlu olduğunu kontrol edin. -->
-    <script src="~/Content/Templates/Tema/JS/jquery.min.js"></script>
-    <script src="~/Content/Templates/Tema/JS/bootstrap.bundle.min.js"></script>
-    <script src="~/Content/Templates/Tema/JS/jquery.easing.min.js"></script>
-    <script src="~/Content/Templates/Tema/JS/tema-2.js"></script>
+    <script>
+    function RegisterRequest() {
+        // Form verilerini al
+        var form = $('#frmRegister');
+
+        // HTML5 Validation kontrolü (Boş alan var mı?)
+        if (!document.getElementById('frmRegister').checkValidity()) {
+            document.getElementById('frmRegister').reportValidity();
+            return;
+        }
+
+        // AJAX İsteği
+        $.ajax({
+            url: '@Url.Action("KayitOL", "Login")',
+            type: 'POST',
+            data: form.serialize(), // Formu otomatik paketle
+            success: function (response) {
+                var msgBox = $("#divError");
+                var msgText = $("#divError h2"); // Yazının olduğu etiket
+
+                if (response.IsSuccess) {
+                    // BAŞARILI DURUMU (YEŞİL)
+                    msgBox.show();
+                    msgText.css("color", "green"); // Rengi yeşil yap
+                    msgText.text(response.Message); // "Kayıt başarıyla oluşturuldu" mesajını yaz
+
+                    // İsteğe bağlı: 2 saniye sonra giriş sayfasına yönlendir
+                    setTimeout(function() {
+                        window.location.href = '@Url.Action("Index", "Login")';
+                    }, 2000);
+
+                } else {
+                    // HATALI DURUMU (KIRMIZI)
+                    msgBox.show();
+                    msgText.css("color", "red"); // Rengi kırmızı yap
+                    msgText.text(response.Message); // "Bu email yetkili değil" mesajını yaz
+                }
+            },
+            error: function () {
+                alert("Sunucu hatası oluştu.");
+            }
+        });
+    }
+    </script>
 
 </body>
 </html>

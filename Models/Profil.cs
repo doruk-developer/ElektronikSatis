@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
-
-namespace ElektronikSatisProje.Models
+﻿namespace ElektronikSatisProje.Models
 {
     public class Profil
     {
@@ -14,5 +9,7 @@ namespace ElektronikSatisProje.Models
         public string Sehir { get; set; }
         public string ResimYolu { get; set; }
         public int ToplamSiparis { get; set; } // İstatistik için
+        public string DogumTarihi { get; set; }
+        public System.Collections.Generic.List<Adres> Adresler { get; set; } = new System.Collections.Generic.List<Adres>(); // Adres listesi
     }
 }

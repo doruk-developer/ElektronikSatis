@@ -1,4 +1,5 @@
 ﻿
+@model ElektronikSatisProje.Models.Profil
 @{
     ViewBag.Title = "Siparişi Tamamla";
     Layout = "~/Views/Shared/_Layout.cshtml";
@@ -17,22 +18,31 @@
                 <h6 class="m-0 font-weight-bold text-primary">Teslimat Adresi</h6>
             </div>
             <div class="card-body">
-                <form>
-                    <div class="form-row">
-                        <div class="form-group col-md-6">
-                            <label>Ad Soyad</label>
-                            <input type="text" class="form-control" value="Doruk Yılmaz">
-                        </div>
-                        <div class="form-group col-md-6">
-                            <label>Telefon</label>
-                            <input type="text" class="form-control" value="0555 123 45 67">
-                        </div>
+                @if (Model.Adresler != null && Model.Adresler.Count > 0)
+                {
+                    <form id="adresSecimForm">
+                        @foreach (var adres in Model.Adresler)
+                        {
+                            <div class="custom-control custom-radio mb-3 border p-3 rounded">
+                                <!-- Radio button value olarak adresin tam metnini tutsun -->
+                                <input type="radio" id="adres_@adres.Baslik" name="SecilenAdres" class="custom-control-input"
+                                       value="@adres.Baslik: @adres.AcikAdres / @adres.Ilce / @adres.Sehir" checked>
+                                <label class="custom-control-label w-100" for="adres_@adres.Baslik">
+                                    <span class="font-weight-bold text-primary">@adres.Baslik</span>
+                                    <br>
+                                    <span class="text-muted small">@adres.AcikAdres - @adres.Ilce / @adres.Sehir</span>
+                                </label>
+                            </div>
+                        }
+                    </form>
+                }
+                else
+                {
+                    <div class="alert alert-warning">
+                        <i class="fas fa-exclamation-triangle"></i> Kayıtlı adresiniz yok.
+                        <a href="~/Home/Profil" class="font-weight-bold">Lütfen profilinizden adres ekleyin.</a>
                     </div>
-                    <div class="form-group">
-                        <label>Adres</label>
-                        <textarea class="form-control" rows="2">Teknoloji Vadisi, B Blok No:14 Levent / İSTANBUL</textarea>
-                    </div>
-                </form>
+                }
             </div>
         </div>
 
@@ -123,27 +133,52 @@
         font-size: 1.2rem;
         display: none; /* Başlangıçta gizli */
     }
+
     @@keyframes popIn {
-        0% { transform: scale(0); opacity: 0; }
-        100% { transform: scale(1); opacity: 1; }
+        0% {
+            transform: scale(0);
+            opacity: 0;
+        }
+
+        100% {
+            transform: scale(1);
+            opacity: 1;
+        }
     }
 </style>
 
 <!-- JAVASCRIPT -->
 <script>
+    // --- 1. KİŞİYE ÖZEL ANAHTARLAR (YENİ EKLENEN KISIM) ---
+    // Giriş yapan kullanıcının adını alıyoruz
+    var activeUser = '@User.Identity.Name';
+
+    // Eğer kullanıcı yoksa boş gelebilir, güvenli olsun diye kontrol edelim
+    // Ama Sepet logic'inde zaten giriş zorunlu kılmıştık.
+
+    // Anahtarları oluşturuyoruz: 'cart_Ali', 'cart_Doruk' gibi...
+    var cartKey = 'cart_' + activeUser;
+    var orderKey = 'orders_' + activeUser;
+    // ------------------------------------------------------
+
     // Sayfa açılınca tutarı göster
     document.addEventListener("DOMContentLoaded", function() {
         calculateTotal();
     });
 
     function calculateTotal() {
-        var cart = JSON.parse(localStorage.getItem('myShoppingCart')) || [];
+        // ARTIK DİNAMİK KEY KULLANIYORUZ
+        var cart = JSON.parse(localStorage.getItem(cartKey)) || [];
         var total = 0;
+
         cart.forEach(item => total += item.price * item.quantity);
-        document.getElementById('checkoutTotal').innerText = formatMoney(total) + " TL";
+
+        // Eğer element varsa yazdır (Hata almamak için kontrol)
+        var totalLabel = document.getElementById('checkoutTotal');
+        if(totalLabel) totalLabel.innerText = formatMoney(total) + " TL";
     }
 
-    // --- 1. KART GİRİŞ FORMATLARI ---
+    // --- 2. KART GİRİŞ FORMATLARI (GÖRSEL DÜZENLEMELER) ---
     function formatCardNumber(input) {
         // Boşlukları sil, 4'lü gruplara ayır
         let val = input.value.replace(/\D/g, '');
@@ -165,7 +200,7 @@
         }
     }
 
-    // --- 2. DOĞRULAMA (Yeşil Tikler & Buton Aktifliği) ---
+    // --- 3. DOĞRULAMA (Yeşil Tikler & Buton Aktifliği) ---
     function validatePayment() {
         let isValid = true;
 
@@ -205,41 +240,78 @@
         document.getElementById('btnCompleteOrder').disabled = !isValid;
     }
 
-    // --- 3. SİPARİŞİ TAMAMLAMA VE KAYDETME ---
+    // --- 4. SİPARİŞİ TAMAMLAMA VE KAYDETME (GÜNCELLENEN KISIM) ---
+   // --- 4. SİPARİŞİ TAMAMLAMA (ADRES SEÇİMLİ FİNAL VERSİYON) ---
     function completeOrder() {
-        // A) Sepetteki ürünleri al
-        var cart = JSON.parse(localStorage.getItem('myShoppingCart')) || [];
+        // 1. Sepeti Al
+        var cart = JSON.parse(localStorage.getItem(cartKey)) || [];
+        if (cart.length === 0) return;
 
-        if(cart.length === 0) return;
+        // --- YENİ EKLENEN KISIM: ADRES KONTROLÜ ---
+        // Radio buttonlardan hangisi seçiliyse onun değerini al
+        var secilenAdres = $("input[name='SecilenAdres']:checked").val();
 
-        // B) Sipariş objesi oluştur
-        var newOrder = {
-            orderNo: Math.floor(Math.random() * 1000000), // Rastgele sipariş no
-            date: new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString(),
-            items: cart,
-            total: document.getElementById('checkoutTotal').innerText,
-            status: "Hazırlanıyor"
+        // Eğer hiçbir şey seçilmemişse uyarı ver ve işlemi durdur
+        if (!secilenAdres) {
+            // SweetAlert varsa onu kullan, yoksa normal alert
+            if(typeof Swal !== 'undefined'){
+                Swal.fire('Eksik Bilgi', 'Lütfen bir teslimat adresi seçiniz (veya Profil sayfasından ekleyiniz).', 'warning');
+            } else {
+                alert("Lütfen bir teslimat adresi seçiniz.");
+            }
+            return; // Fonksiyonu burada keser, aşağıya inmez
+        }
+        // -------------------------------------------
+
+        var totalText = document.getElementById('checkoutTotal').innerText;
+
+        // 2. Sipariş Nesnesini Hazırla
+        var orderData = {
+            SiparisNo: Math.floor(Math.random() * 1000000).toString(),
+            Tarih: new Date().toLocaleString(),
+            ToplamTutar: totalText,
+            Durum: "Hazırlanıyor",
+            TeslimatAdresi: secilenAdres, // <-- ADRESİ BURAYA EKLİYORUZ
+            Urunler: []
         };
 
-        // C) Geçmiş siparişlere ekle
-        var pastOrders = JSON.parse(localStorage.getItem('myPastOrders')) || [];
-        pastOrders.unshift(newOrder); // En başa ekle
-        localStorage.setItem('myPastOrders', JSON.stringify(pastOrders));
+        // Sepetteki ürünleri backend formatına çevir
+        cart.forEach(function(item) {
+            orderData.Urunler.push({
+                UrunAdi: item.name,
+                Resim: item.image,
+                Fiyat: item.price,
+                Adet: item.quantity
+            });
+        });
 
-        // D) Sepeti Boşalt
-        localStorage.removeItem('myShoppingCart');
+        // 3. AJAX ile Sunucuya Gönder
+        $.ajax({
+            url: '@Url.Action("SiparisKaydet", "Home")',
+            type: 'POST',
+            data: orderData,
+            success: function(response) {
+                if (response.success) {
+                    // Başarılıysa Sepeti Temizle
+                    localStorage.removeItem(cartKey);
+                    if (window.calculateCartTotal) window.calculateCartTotal();
 
-        // Layout sayacını sıfırla (Global fonksiyona erişim varsa)
-        if(window.calculateCartTotal) window.calculateCartTotal(); // Opsiyonel
+                    // Animasyonu Göster
+                    var overlay = document.getElementById('successOverlay');
+                    if(overlay) overlay.style.display = 'flex';
 
-        // E) Şov Yap (Overlay Göster)
-        var overlay = document.getElementById('successOverlay');
-        overlay.style.display = 'flex';
-
-        // F) 3 Saniye sonra yönlendir
-        setTimeout(function() {
-            window.location.href = '@Url.Action("Gecmis_Siparislerim", "Home")';
-        }, 3000);
+                    // 2 Saniye Sonra Yönlendir
+                    setTimeout(function() {
+                        window.location.href = '@Url.Action("Gecmis_Siparislerim", "Home")';
+                    }, 2000);
+                } else {
+                    alert("Sipariş kaydedilirken hata oluştu.");
+                }
+            },
+            error: function() {
+                alert("Sunucu hatası.");
+            }
+        });
     }
 
     function formatMoney(amount) {

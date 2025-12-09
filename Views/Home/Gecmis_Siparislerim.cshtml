@@ -1,22 +1,87 @@
 ﻿
+@model List<ElektronikSatisProje.Models.Siparis>
 @{
-    ViewBag.Title = "Geçmiş Siparişlerim";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
+
 
 <!-- Başlık ve Temizle Butonu -->
 <div class="d-sm-flex align-items-center justify-content-between mb-4">
     <h1 class="h3 mb-0 text-gray-800">Geçmiş Siparişlerim</h1>
 
     <!-- TEMİZLEME BUTONU -->
-    <button onclick="clearHistory()" class="d-none d-sm-inline-block btn btn-sm btn-danger shadow-sm">
+    <a href="@Url.Action("GecmisiTemizle", "Home")"
+       onclick="return confirm('Tüm sipariş geçmişiniz silinecek. Emin misiniz?');"
+       class="d-none d-sm-inline-block btn btn-sm btn-danger shadow-sm">
         <i class="fas fa-trash fa-sm text-white-50"></i> Geçmişi Temizle
-    </button>
+    </a>
 </div>
 
 <!-- Siparişlerin Listelendiği Alan -->
 <div id="ordersContainer">
-    <!-- JavaScript burayı dolduracak -->
+    @if (Model != null && Model.Count > 0)
+    {
+        foreach (var order in Model)
+        {
+            <div class="card shadow mb-4 border-left-success">
+                <div class="card-header py-3 bg-white">
+                    <div class="d-flex justify-content-between align-items-center">
+
+                        <!-- SOL TARAFTAKİ BİLGİLER -->
+                        <div>
+                            <h6 class="m-0 font-weight-bold text-success">Sipariş No: #@order.SiparisNo</h6>
+                            <small class="text-muted">@order.Tarih</small>
+                        </div>
+
+                        <!-- SAĞ TARAFTAKİ BİLGİLER VE SİL BUTONU -->
+                        <div class="text-right d-flex align-items-center">
+                            <div class="mr-3">
+                                <div class="h5 font-weight-bold text-dark mb-0">@order.ToplamTutar</div>
+                                <span class="badge badge-info">@order.Durum</span>
+                            </div>
+
+                            <!-- YENİ EKLENEN: TEKİL SİLME BUTONU -->
+                            <a href="@Url.Action("SiparisSil", "Home", new { siparisNo = order.SiparisNo })"
+                               onclick="return confirm('Bu sipariş kaydını silmek istediğinize emin misiniz?');"
+                               class="btn btn-outline-danger btn-circle btn-sm" title="Bu siparişi sil">
+                                <i class="fas fa-times"></i>
+                            </a>
+
+                        </div>
+                    </div>
+
+                    <!-- Adres Bilgisi (Aynen Kalıyor) -->
+                    <div class="mt-2 pt-2 border-top small text-muted">
+                        <i class="fas fa-map-marker-alt text-danger mr-1"></i>
+                        <strong>Teslimat Adresi:</strong> @order.TeslimatAdresi
+                    </div>
+                </div>
+                <div class="card-body">
+                    @if (order.Urunler != null)
+                    {
+                        foreach (var item in order.Urunler)
+                        {
+                            <div class="d-flex align-items-center mb-2 border-bottom pb-2">
+                                <img src="@item.Resim" style="width:50px; height:50px; object-fit:contain; border:1px solid #eee; border-radius:5px;" class="mr-3">
+                                <div>
+                                    <span class="font-weight-bold text-dark">@item.UrunAdi</span><br>
+                                    <span class="small text-muted">@item.Adet Adet x @item.Fiyat.ToString("N0") TL</span>
+                                </div>
+                            </div>
+                        }
+                    }
+                </div>
+            </div>
+        }
+    }
+    else
+    {
+        <div class="text-center py-5">
+            <i class="fas fa-box-open fa-3x text-gray-300 mb-3"></i>
+            <p class="lead text-gray-800">Henüz bir siparişiniz bulunmuyor.</p>
+            <a href="~/Home/Index" class="btn btn-primary">Alışverişe Başla</a>
+        </div>
+    }
 </div>
 
 <!-- Sipariş Yok Mesajı (Gizli) -->
@@ -25,94 +90,3 @@
     <p class="lead text-gray-800">Henüz bir siparişiniz bulunmuyor.</p>
     <a href="~/Home/Index" class="btn btn-primary">Alışverişe Başla</a>
 </div>
-
-<!-- JAVASCRIPT -->
-<script>
-    document.addEventListener("DOMContentLoaded", function () {
-        renderOrders();
-    });
-
-    // Siparişleri Ekrana Basma Fonksiyonu
-    function renderOrders() {
-        var orders = JSON.parse(localStorage.getItem('myPastOrders')) || [];
-        var container = document.getElementById('ordersContainer');
-        var noOrderMsg = document.getElementById('noOrderMessage');
-
-        // Önce temizle ki üst üste binmesin
-        container.innerHTML = "";
-
-        if (orders.length === 0) {
-            noOrderMsg.style.display = 'block';
-            return;
-        } else {
-            noOrderMsg.style.display = 'none';
-        }
-
-        orders.forEach(order => {
-            var productHtml = "";
-            // Sipariş içindeki her ürünü listele
-            order.items.forEach(item => {
-                // Resim yolu kontrolü (Hata vermemesi için)
-                var imgPath = item.image ? item.image : '/Content/image/sembol_sepet.png';
-
-                productHtml += `
-                    <div class="d-flex align-items-center mb-2 border-bottom pb-2">
-                        <img src="${imgPath}" style="width:50px; height:50px; object-fit:contain; border:1px solid #eee; border-radius:5px;" class="mr-3">
-                        <div>
-                            <span class="font-weight-bold text-dark">${item.name}</span><br>
-                            <span class="small text-muted">${item.quantity} Adet x ${formatMoney(item.price)} TL</span>
-                        </div>
-                    </div>
-                `;
-            });
-
-            var cardHtml = `
-                <div class="card shadow mb-4 border-left-success">
-                    <div class="card-header py-3 d-flex justify-content-between align-items-center bg-white">
-                        <div>
-                            <h6 class="m-0 font-weight-bold text-success">Sipariş No: #${order.orderNo}</h6>
-                            <small class="text-muted">${order.date}</small>
-                        </div>
-                        <div class="text-right">
-                            <div class="h5 font-weight-bold text-dark">${order.total}</div>
-                            <span class="badge badge-info">${order.status}</span>
-                        </div>
-                    </div>
-                    <div class="card-body">
-                        ${productHtml}
-                    </div>
-                </div>
-            `;
-            container.innerHTML += cardHtml;
-        });
-    }
-
-    // GEÇMİŞİ TEMİZLEME FONKSİYONU (YENİ)
-    function clearHistory() {
-        // Önce geçmiş var mı kontrol et
-        var orders = JSON.parse(localStorage.getItem('myPastOrders')) || [];
-
-        if (orders.length === 0) {
-            alert("Zaten temizlenecek bir geçmişiniz yok.");
-            return;
-        }
-
-        // Kullanıcıdan onay al
-        if (confirm("Tüm sipariş geçmişiniz kalıcı olarak silinecek. Emin misiniz?")) {
-            // 1. Hafızayı sil
-            localStorage.removeItem('myPastOrders');
-
-            // 2. Ekranı yenile (renderOrders boş liste göreceği için 'Sipariş Yok' mesajını gösterecek)
-            renderOrders();
-
-            // Ufak bir bildirim (Opsiyonel)
-            // alert("Geçmiş temizlendi.");
-        }
-    }
-
-    // Para Formatı
-    function formatMoney(amount) {
-        return amount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
-    }
-</script>
-

@@ -1,359 +1,663 @@
+
 @{
-    // Mesajları depodan çekiyoruz
-    var bildirimler = ElektronikSatisProje.Models.MesajDeposu.MesajlariGetir();
-}
+    string profilResimYolu = "/Content/image/user_circle.png";
+    var bildirimler = new List<ElektronikSatisProje.Models.Mesaj>
+    ();
+    int siparisSayisi = 0; // <--- YENİ DEĞİŞKEN
+                                   if (User.Identity.IsAuthenticated)
+                                   {
+                                   var tumKullanicilar=ElektronikSatisProje.Models.VeriYoneticisi.VerileriGetir();
+                                   var aktifKullanici=tumKullanicilar.FirstOrDefault(x =>
+        x.KullaniciAdi == User.Identity.Name);
 
-<!DOCTYPE html>
-<html lang="en">
-
-<head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <meta name="description" content="">
-    <meta name="author" content="">
-
-    <title>Doruk Shop - @ViewBag.Title</title>
-
-    <!-- Favicon-->
-    <link rel="icon" href="~/Content/image/fav_icon.png" type="image/jpeg" />
-    <link rel="shortcut icon" href="~/Content/image/fav_icon.jpg" type="image/jpeg" />
-
-    <!-- Custom fonts for this template-->
-    <link href="~/Content/Templates/Tema/CSS/all.min.css" rel="stylesheet" />
-    <link href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i" rel="stylesheet">
-
-    <!-- Custom styles for this template-->
-    <link href="~/Content/Templates/Tema/CSS/tema-2.min.css" rel="stylesheet" />
-
-    <!----------------------------------------------Tema Ayarları İçin---------------------------------------------------->
-    <style>
-        /* Renk Kutucukları Tasarımı */
-        .theme-color-box {
-            width: 50px; /* Kutunun Genişliği */
-            height: 50px; /* Kutunun Yüksekliği */
-            border-radius: 8px; /* Köşeleri Yuvarlatma */
-            cursor: pointer; /* Üzerine gelince el işareti çıksın */
-            margin-right: 15px; /* Kutular arası boşluk */
-            display: flex; /* İkonu ortalamak için */
-            align-items: center;
-            justify-content: center;
-            border: 2px solid transparent; /* Seçili değilken kenarlık görünmesin */
-            transition: all 0.2s; /* Animasyonlu büyüme */
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1); /* Hafif gölge */
+        if (aktifKullanici != null)
+        {
+        if (!string.IsNullOrEmpty(aktifKullanici.ProfilBilgisi.ResimYolu))
+        {
+        profilResimYolu = aktifKullanici.ProfilBilgisi.ResimYolu;
+        }
+        if (aktifKullanici.Mesajlar != null)
+        {
+        bildirimler = aktifKullanici.Mesajlar;
         }
 
-            /* Üzerine gelince efekt */
-            .theme-color-box:hover {
-                transform: scale(1.1); /* Biraz büyüsün */
-            }
-
-            /* Seçili Olan Kutunun Özellikleri */
-            .theme-color-box.selected-theme {
-                border: 3px solid #5a5c69; /* Etrafına kalın gri çizgi */
-                transform: scale(1.1);
-                box-shadow: 0 0 15px rgba(0,0,0,0.3);
-            }
-
-        /* Tık İkonu */
-        .check-icon {
-            font-size: 1.2rem;
-            text-shadow: 0 1px 2px rgba(0,0,0,0.4);
+        // --- YENİ EKLENEN KISIM: SİPARİŞLERİ SAY ---
+        if (aktifKullanici.Siparisler != null)
+        {
+        siparisSayisi = aktifKullanici.Siparisler.Count;
+        }
+        // -------------------------------------------
+        }
+        }
         }
 
-        /* --- DARK MODE STİLLERİ --- */
-        body.dark-mode {
-            background-color: #121212 !important;
-            color: #e0e0e0;
-        }
+        <!DOCTYPE html>
+        <html lang="en">
 
-            body.dark-mode #content-wrapper {
-                background-color: #121212 !important;
-            }
+        <head>
+            <meta charset="utf-8">
+            <meta http-equiv="X-UA-Compatible" content="IE=edge">
+            <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+            <title>Doruk Shop - @ViewBag.Title</title>
 
-            body.dark-mode .card {
-                background-color: #1e1e1e !important;
-                border-color: #333;
-                color: #e0e0e0;
-            }
+            <link rel="icon" href="~/Content/image/fav_icon.png" type="image/jpeg" />
+            <link href="~/Content/Templates/Tema/CSS/all.min.css" rel="stylesheet" />
+            <link href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i" rel="stylesheet">
+            <link href="~/Content/Templates/Tema/CSS/tema-2.min.css" rel="stylesheet" />
+            <script src="~/Content/Templates/Tema/JS/sweetalert2.all.min.js"></script>
 
-            body.dark-mode .topbar {
-                background-color: #1e1e1e !important;
-                border-bottom: 1px solid #333 !important;
-            }
+            <style>
+                /* 1. SAYFA DÜZENİ (FOOTER İÇİN) */
+                html, body {
+                    height: 100%;
+                    margin: 0;
+                }
 
-            body.dark-mode .text-gray-800,
-            body.dark-mode h1, body.dark-mode h2, body.dark-mode h3 {
-                color: #e0e0e0 !important;
-            }
+                body {
+                    display: flex;
+                    flex-direction: column;
+                    background-color: #f8f9fc;
+                }
 
-            body.dark-mode .form-control {
-                background-color: #2d2d2d;
-                border-color: #444;
-                color: #fff;
-            }
-    </style>
-    <!----------------------------------------------Tema Ayarları İçin---------------------------------------------------->
-</head>
+                .main-content {
+                    flex: 1 0 auto;
+                    padding-top: 100px;
+                    padding-bottom: 40px;
+                }
 
-<body id="page-top">
+                footer {
+                    flex-shrink: 0;
+                    width: 100%;
+                    background-color: white;
+                    padding: 25px 0;
+                    border-top: 1px solid #e3e6f0;
+                }
 
-    <!-- Page Wrapper -->
-    <div id="wrapper">
+                /* 2. NAVBAR (GÖSTERİŞLİ) */
+                .navbar-custom {
+                    /* Varsayılan Renk (JS ile değişecek) */
+                    background: linear-gradient(90deg, #4e73df 0%, #224abe 100%);
+                    padding: 0.8rem 1rem;
+                    transition: background 0.5s ease;
+                }
 
-        <!-- Sidebar -->
-        <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar">
+                .navbar-brand {
+                    font-size: 1.8rem;
+                    font-weight: 800;
+                    letter-spacing: 1px;
+                    text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+                }
 
-            <!-- Sidebar - Brand -->
-            <a class="sidebar-brand d-flex align-items-center justify-content-center" href="~/Home/Index">
-                <div class="sidebar-brand-icon rotate-n-15">
-                    <i class="fas fa-laugh-wink"></i>
-                </div>
-                <div class="sidebar-brand-text mx-3">Doruk<br>Shop</div>
-            </a>
+                /* 3. ARAMA ÇUBUĞU (GLASSMORPHISM - BUZLU CAM ETKİSİ) */
+                .search-wrapper {
+                    background: rgba(255, 255, 255, 0.15); /* Yarı saydam beyaz */
+                    border-radius: 50px; /* Tam yuvarlak köşeler */
+                    padding: 2px;
+                    display: flex;
+                    align-items: center;
+                    border: 1px solid rgba(255,255,255,0.2);
+                    transition: all 0.3s;
+                }
 
-            <!-- Divider -->
-            <hr class="sidebar-divider my-0">
+                    .search-wrapper:hover, .search-wrapper:focus-within {
+                        background: rgba(255, 255, 255, 0.25);
+                        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+                    }
 
-            <!-- Nav Item - Ana Sayfa -->
-            <li class="nav-item active">
-                <a class="nav-link" href="~/Home/Index">
-                    <i class="fas fa-fw fa-tachometer-alt"></i>
-                    <span>Ana Sayfa</span>
-                </a>
-            </li>
+                .search-input {
+                    background: transparent;
+                    border: none;
+                    color: white;
+                    padding-left: 20px;
+                    font-weight: 600;
+                }
 
-            <!-- Divider -->
-            <hr class="sidebar-divider">
+                    .search-input::placeholder {
+                        color: rgba(255,255,255,0.7);
+                    }
 
-            <!-- Heading -->
-            <div class="sidebar-heading">
-                Ürünler
-            </div>
+                    .search-input:focus {
+                        background: transparent;
+                        color: white;
+                        box-shadow: none;
+                    }
 
-            <!-- Nav Item - Pages Collapse Menu -->
-            <li class="nav-item">
-                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseTwo"
-                   aria-expanded="true" aria-controls="collapseTwo">
-                    <i class="fas fa-fw fa-cog"></i>
-                    <span>Ev Elektroniği</span>
-                </a>
-                <div id="collapseTwo" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
-                    <div class="bg-white py-2 collapse-inner rounded">
-                        <h6 class="collapse-header">Ev Elektroniği:</h6>
-                        <a class="collapse-item" href="~/home/Bilgisayarlar">Bilgisayarlar</a>
-                        <a class="collapse-item" href="~/home/Cep_Telefonları">Cep Telefonları</a>
-                    </div>
-                </div>
-            </li>
+                .search-btn {
+                    background: transparent;
+                    color: rgba(255,255,255,0.8);
+                    border: none;
+                    border-radius: 50%;
+                    width: 40px;
+                    height: 40px;
+                    transition: all 0.2s;
+                }
 
-            <!-- Nav Item - Utilities Collapse Menu -->
-            <li class="nav-item">
-                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseUtilities"
-                   aria-expanded="true" aria-controls="collapseUtilities">
-                    <i class="fas fa-fw fa-wrench"></i>
-                    <span>Endüstriyel Elektronik</span>
-                </a>
-                <div id="collapseUtilities" class="collapse" aria-labelledby="headingUtilities"
-                     data-parent="#accordionSidebar">
-                    <div class="bg-white py-2 collapse-inner rounded">
-                        <h6 class="collapse-header">Endüstriyel Elektronik:</h6>
-                        <a class="collapse-item" href="~/home/Switchler">Switchler</a>
-                        <a class="collapse-item" href="~/home/Routerlar">Routerlar</a>
-                    </div>
-                </div>
-            </li>
+                    .search-btn:hover {
+                        background: white;
+                        color: #4e73df;
+                        transform: scale(1.1);
+                    }
 
-            <!-- Divider -->
-            <hr class="sidebar-divider">
+                /* 4. PROFİL & SEPET (BÜYÜTÜLDÜ) */
+                .nav-link {
+                    color: rgba(255,255,255,0.95) !important;
+                    font-weight: 700;
+                    font-size: 1rem;
+                }
 
-                      
+                .img-profile {
+                    width: 50px; /* Büyüttük */
+                    height: 50px;
+                    object-fit: cover;
+                    border: 3px solid rgba(255,255,255,0.5); /* Çerçeve */
+                    transition: all 0.2s;
+                }
 
-            <!-- Nav Item - Geçmiş Siparişlerim -->
-            <li class="nav-item">
-                <a class="nav-link" href="@Url.Action("Gecmis_Siparislerim", "Home")">
-                    <i class="fas fa-fw fa-chart-area"></i>
-                    <span>Geçmiş Siparişlerim</span>
-                </a>
-            </li>
+                    .img-profile:hover {
+                        border-color: white;
+                        transform: scale(1.05);
+                    }
 
-            <!-- Divider -->
-            <hr class="sidebar-divider d-none d-md-block">
+                .cart-icon-img {
+                    height: 45px;
+                    width: auto;
+                    filter: drop-shadow(0 2px 3px rgba(0,0,0,0.3));
+                    transition: transform 0.2s;
+                }
 
-            <!-- Sidebar Toggler (Sidebar) -->
-            <div class="text-center d-none d-md-inline">
-                <button class="rounded-circle border-0" id="sidebarToggle"></button>
-            </div>
+                    .cart-icon-img:hover {
+                        transform: scale(1.1) rotate(-5deg);
+                    }
 
-        </ul>
-        <!-- End of Sidebar -->
-        <!-- Content Wrapper -->
-        <div id="content-wrapper" class="d-flex flex-column">
+                .badge-counter {
+                    top: -2px;
+                    right: -5px;
+                    font-size: 0.8rem;
+                    padding: 0.35em 0.6em;
+                    background-color: #e74a3b;
+                    border: 2px solid white;
+                    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+                }
 
-            <!-- Main Content -->
-            <div id="content">
+                /* 5. TEMA RENK KUTUCUKLARI (Dropdown İçinde) */
+                .theme-circle {
+                    width: 30px;
+                    height: 30px;
+                    border-radius: 50%;
+                    cursor: pointer;
+                    display: inline-block;
+                    margin: 0 5px;
+                    border: 2px solid #eaecf4;
+                    transition: transform 0.2s;
+                }
 
-                <!-- Topbar -->
-                <nav class="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top shadow">
+                    .theme-circle:hover {
+                        transform: scale(1.2);
+                        border-color: #858796;
+                    }
 
-                    <!-- Sidebar Toggle (Topbar) -->
-                    <button id="sidebarToggleTop" class="btn btn-link d-md-none rounded-circle mr-3">
-                        <i class="fa fa-bars"></i>
+
+                /* --- KATEGORİLER İÇİN YAN MENÜ (NESTED DROPDOWN) --- */
+
+                .dropdown-submenu {
+                    position: relative;
+                }
+
+                    /* Alt menüyü sağ tarafa aç */
+                    .dropdown-submenu > .dropdown-menu {
+                        top: 0;
+                        left: 100%; /* Tam yanına */
+                        margin-top: -6px;
+                        margin-left: 0px;
+                        border-radius: 0.35rem;
+                        display: none; /* Varsayılan gizli */
+                    }
+
+                    /* Mouse üzerine gelince göster */
+                    .dropdown-submenu:hover > .dropdown-menu {
+                        display: block;
+                    }
+
+                    /* Oku Sağa Çevir (Bootstrap'ın varsayılan aşağı okunu döndürüyoruz) */
+                    .dropdown-submenu > a::after {
+                        transform: rotate(-90deg);
+                        position: absolute;
+                        right: 10px;
+                        top: 45%;
+                    }
+
+
+
+
+                /* --- CANLI ARAMA KUTUSU TASARIMI --- */
+                .search-results-box {
+                    position: absolute;
+                    top: 100%; /* Arama kutusunun tam altına */
+                    left: 15px; /* Hafif içe */
+                    width: 95%;
+                    background: white;
+                    border-radius: 0 0 15px 15px; /* Alt köşeleri yuvarla */
+                    z-index: 1000;
+                    display: none; /* Başlangıçta gizli */
+                    max-height: 400px;
+                    overflow-y: auto; /* Çok sonuç çıkarsa kaydırma çubuğu çıksın */
+                    border: 1px solid #e3e6f0;
+                }
+
+                /* Sonuç Satırları */
+                .search-item {
+                    padding: 10px 15px;
+                    border-bottom: 1px solid #f1f1f1;
+                    display: flex;
+                    align-items: center;
+                    text-decoration: none !important;
+                    transition: background 0.2s;
+                }
+
+                    .search-item:hover {
+                        background-color: #f8f9fc;
+                    }
+
+                    .search-item:last-child {
+                        border-bottom: none;
+                    }
+
+                .search-thumb {
+                    width: 40px;
+                    height: 40px;
+                    object-fit: contain;
+                    margin-right: 15px;
+                    border: 1px solid #eee;
+                    border-radius: 5px;
+                }
+
+                .search-info h6 {
+                    font-size: 0.9rem;
+                    margin: 0;
+                    color: #333;
+                    font-weight: 700;
+                }
+
+                .search-info span {
+                    font-size: 0.8rem;
+                    color: #1cc88a;
+                    font-weight: 600;
+                }
+
+
+                /* KAR YAĞIŞI SİMÜLASYONU */
+                .snow-container {
+                    position: fixed;
+                    top: 0;
+                    left: 0;
+                    width: 100%;
+                    height: 100%;
+                    pointer-events: none; /* Tıklamaları engellememesi için şart */
+                    z-index: 9999;
+                    background-image: url('data:image/svg+xml;charset=utf8,%3Csvg xmlns="http://www.w3.org/2000/svg" width="100" height="100"%3E%3Ccircle cx="50" cy="50" r="1.5" fill="rgba(255,255,255,0.7)"/%3E%3C/svg%3E'), url('data:image/svg+xml;charset=utf8,%3Csvg xmlns="http://www.w3.org/2000/svg" width="100" height="100"%3E%3Ccircle cx="50" cy="50" r="1" fill="rgba(255,255,255,0.5)"/%3E%3C/svg%3E');
+                    background-repeat: repeat;
+                    animation: snowfall 10s linear infinite;
+                }
+
+                @@keyframes snowfall {
+                    0% {
+                        background-position: 0 0, 0 0;
+                    }
+
+                    100% {
+                        background-position: 500px 1000px, 200px 500px;
+                    }
+                }
+
+                /* SAYFA GİRİŞ ANİMASYONU */
+                .fade-in {
+                    animation: fadeInPage 0.8s ease-out forwards;
+                }
+
+                @@keyframes fadeInPage {
+                    0% {
+                        opacity: 0;
+                        transform: translateY(20px); /* 20px aşağıdan başla */
+                    }
+
+                    100% {
+                        opacity: 1;
+                        transform: translateY(0); /* Yerine otur */
+                    }
+                }
+
+
+                /* --- GLOBAL ÜRÜN KARTI TASARIMI (Tüm Sayfalar İçin) --- */
+                .product-card {
+                    border: none;
+                    border-radius: 15px;
+                    overflow: hidden;
+                    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+                    background: #fff;
+                    position: relative;
+                }
+
+                    .product-card:hover {
+                        transform: translateY(-10px);
+                        box-shadow: 0 14px 28px rgba(0,0,0,0.15), 0 10px 10px rgba(0,0,0,0.12) !important;
+                    }
+
+                .img-container {
+                    height: 220px;
+                    padding: 20px;
+                    background: radial-gradient(circle, rgba(255,255,255,1) 0%, rgba(240,242,255,1) 100%);
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                }
+
+                .product-img {
+                    max-height: 100%;
+                    max-width: 100%;
+                    object-fit: contain;
+                    transition: transform 0.3s ease;
+                }
+
+                .product-card:hover .product-img {
+                    transform: scale(1.1);
+                }
+
+                .price-tag {
+                    font-size: 1.2rem;
+                    color: #4e73df;
+                    font-weight: 800;
+                }
+
+                .btn-add-cart {
+                    border-radius: 50px;
+                    font-weight: 700;
+                    text-transform: uppercase;
+                    font-size: 0.8rem;
+                    padding: 8px 0;
+                    transition: all 0.3s;
+                    background: linear-gradient(90deg, #4e73df 0%, #224abe 100%);
+                    border: none;
+                    color: white;
+                }
+
+                    .btn-add-cart:hover {
+                        background: linear-gradient(90deg, #224abe 0%, #4e73df 100%);
+                        transform: scale(1.02);
+                    }
+
+                .discount-tag {
+                    background: #e74a3b;
+                    color: white;
+                    padding: 5px 10px;
+                    border-radius: 20px;
+                    font-size: 0.8rem;
+                    font-weight: 700;
+                    box-shadow: 0 4px 6px rgba(231, 74, 59, 0.4);
+                    animation: pulse 2s infinite;
+                }
+
+                @@keyframes pulse {
+                    0% {
+                        transform: scale(1);
+                    }
+
+                    50% {
+                        transform: scale(1.05);
+                    }
+
+                    100% {
+                        transform: scale(1);
+                    }
+                }
+
+                /* --- LOGO TASARIMI --- */
+
+                .navbar-brand {
+                    text-decoration: none !important; /* Alt çizgi olmasın */
+                }
+
+                /* İkon Kutusu */
+                .brand-icon-box {
+                    background-color: white;
+                    color: #4e73df; /* Temanın mavisi */
+                    width: 40px;
+                    height: 40px;
+                    border-radius: 8px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    font-size: 1.4rem;
+                    box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+                    transform: rotate(-10deg); /* Hafif yamuk duruş */
+                    transition: transform 0.3s;
+                }
+
+                /* Üzerine gelince ikon düzelsin */
+                .navbar-brand:hover .brand-icon-box {
+                    transform: rotate(0deg) scale(1.1);
+                }
+
+                /* DORUK Yazısı */
+                .brand-text-main {
+                    font-size: 1.4rem;
+                    font-weight: 900;
+                    color: white;
+                    letter-spacing: 1px;
+                    text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+                }
+
+                /* SHOP Yazısı */
+                .brand-text-sub {
+                    font-size: 0.7rem;
+                    font-weight: 700;
+                    color: #f6c23e; /* Sarı */
+                    letter-spacing: 3px;
+                    text-align: right;
+                    margin-top: -3px;
+                }
+
+                /* --- KALP İKONU (FAVORİ BUTONU) --- */
+                .btn-fav {
+                    position: absolute;
+                    top: 10px;
+                    right: 10px;
+                    z-index: 20; /* Resmin üzerinde dursun */
+                    background: rgba(255, 255, 255, 0.8);
+                    border: none;
+                    border-radius: 50%;
+                    width: 35px;
+                    height: 35px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    color: #b7b7b7; /* Varsayılan gri */
+                    transition: all 0.2s;
+                    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+                    cursor: pointer;
+                }
+
+                    .btn-fav:hover {
+                        background: white;
+                        color: #e74a3b; /* Hover olunca kırmızı */
+                        transform: scale(1.1);
+                    }
+
+                    .btn-fav.active {
+                        color: #e74a3b; /* Favorideyse hep kırmızı */
+                    }
+
+            </style>
+        </head>
+
+        <body id="page-top">
+            <div class="snow-container"></div>
+
+            <!-- NAVBAR -->
+            <nav class="navbar navbar-expand-lg navbar-dark navbar-custom shadow fixed-top" id="mainNavbar">
+                <div class="container">
+
+                    <!-- MODERN LOGO VE SLOGAN -->
+                    <a class="navbar-brand d-flex align-items-center" href="@Url.Action("Index", "Home")">
+
+                        <!-- 1. Kutulu Şimşek İkonu -->
+                        <div class="brand-icon-box mr-2">
+                            <i class="fas fa-bolt"></i>
+                        </div>
+
+                        <!-- 2. Doruk Shop Yazısı (Alt alta) -->
+                        <div class="d-flex flex-column mr-3" style="line-height: 1;">
+                            <span class="brand-text-main">DORUK</span>
+                            <span class="brand-text-sub">SHOP</span>
+                        </div>
+
+                        <!-- 3. Değişen Slogan (Eski kodunu koruduk) -->
+                        <span id="dynamicSlogan" class="d-none d-lg-inline"
+                              style="font-size: 0.8rem; color: #f6c23e; font-weight: 600; opacity: 0; transition: opacity 0.5s; border-left: 1px solid rgba(255,255,255,0.3); padding-left: 10px;">
+                        </span>
+                    </a>
+
+                    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarResponsive">
+                        <span class="navbar-toggler-icon"></span>
                     </button>
 
-                    <!-- Topbar Search -->
-                    <form action="@Url.Action("Arama", "Home")" method="get" class="d-none d-sm-inline-block form-inline mr-auto ml-md-3 my-2 my-md-0 mw-100 navbar-search">
-                        <div class="input-group">
-                            <!-- name="q" parametresi çok önemli, controller bunu yakalayacak -->
-                            <input type="text" name="q" class="form-control bg-light border-0 small" placeholder="Ürün, marka veya kategori ara..." aria-label="Search" aria-describedby="basic-addon2">
-                            <div class="input-group-append">
-                                <button class="btn btn-primary theme-search-btn" type="submit">
-                                    <i class="fas fa-search fa-sm"></i>
-                                </button>
+                    <div class="collapse navbar-collapse" id="navbarResponsive">
+
+                        <!-- HOKUS POKUS ARAMA ÇUBUĞU(Canlı Aramalı) -->
+                        <form action="@Url.Action("Arama", "Home")" method="get" class="form-inline mx-auto w-50 position-relative">
+                            <div class="input-group w-100 search-wrapper">
+                                <!-- Input'a 'onkeyup' ekliyoruz -->
+                                <input type="text" name="q" id="liveSearchInput" class="form-control search-input"
+                                       placeholder="Ürün veya kategori ara..." aria-label="Search" autocomplete="off"
+                                       onkeyup="liveSearch(this)">
+                                <div class="input-group-append">
+                                    <button class="btn search-btn" type="submit">
+                                        <i class="fas fa-search"></i>
+                                    </button>
+                                </div>
                             </div>
-                        </div>
-                    </form>
 
-                    <!-- Topbar Navbar -->
-                    <ul class="navbar-nav ml-auto">
+                            <!-- CANLI SONUÇ KUTUSU (BURAYI YENİ EKLİYORUZ) -->
+                            <div id="searchResults" class="search-results-box shadow-lg">
+                                <!-- JavaScript burayı dolduracak -->
+                            </div>
+                        </form>
 
-                        <!-- Nav Item - Search Dropdown (Visible Only XS) -->
-                        <li class="nav-item dropdown no-arrow d-sm-none">
-                            <a class="nav-link dropdown-toggle" href="#" id="searchDropdown" role="button"
-                               data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                <i class="fas fa-search fa-fw"></i>
-                            </a>
-                            <!-- Dropdown - Messages -->
-                            <div class="dropdown-menu dropdown-menu-right p-3 shadow animated--grow-in"
-                                 aria-labelledby="searchDropdown">
-                                <form class="form-inline mr-auto w-100 navbar-search">
-                                    <div class="input-group">
-                                        <input type="text" class="form-control bg-light border-0 small"
-                                               placeholder="Search for..." aria-label="Search"
-                                               aria-describedby="basic-addon2">
-                                        <div class="input-group-append">
-                                            <button class="btn btn-primary" type="button">
-                                                <i class="fas fa-search fa-sm"></i>
-                                            </button>
-                                        </div>
+
+
+                        <ul class="navbar-nav ml-auto align-items-center">
+
+                            <!-- Menüler -->
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                    Kategoriler
+                                </a>
+                                <ul class="dropdown-menu shadow animated--grow-in" aria-labelledby="navbarDropdown">
+
+                                    <!-- 1. ANA KATEGORİ: EV ELEKTRONİĞİ -->
+                                    <li class="dropdown-submenu">
+                                        <a class="dropdown-item dropdown-toggle" href="#">Ev Elektroniği</a>
+                                        <ul class="dropdown-menu">
+                                            <li><a class="dropdown-item" href="~/Home/Bilgisayarlar">Bilgisayarlar</a></li>
+                                            <li><a class="dropdown-item" href="~/Home/Cep_Telefonları">Telefonlar</a></li>
+                                        </ul>
+                                    </li>
+
+                                    <div class="dropdown-divider"></div>
+
+                                    <!-- 2. ANA KATEGORİ: ENDÜSTRİYEL -->
+                                    <li class="dropdown-submenu">
+                                        <a class="dropdown-item dropdown-toggle" href="#">Endüstriyel</a>
+                                        <ul class="dropdown-menu">
+                                            <li><a class="dropdown-item" href="~/Home/Switchler">Switchler</a></li>
+                                            <li><a class="dropdown-item" href="~/Home/Routerlar">Routerlar</a></li>
+                                        </ul>
+                                    </li>
+
+                                </ul>
+                            </li>
+
+                            <div class="topbar-divider d-none d-sm-block"></div>
+
+                            <!-- SEPET -->
+                            <li class="nav-item no-arrow mx-2 position-relative">
+                                <a class="nav-link" href="@Url.Action("Sepet", "Home")">
+                                    <img src="~/Content/image/sembol_sepet.png" class="cart-icon-img">
+                                    <span class="badge badge-danger badge-counter rounded-circle" id="cartItemCount" style="display:none; position:absolute;">0</span>
+                                </a>
+                            </li>
+
+                            <!-- PROFİL & AYARLAR -->
+                            <li class="nav-item dropdown no-arrow ml-1">
+                                <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-toggle="dropdown">
+                                    <span class="mr-2 d-none d-lg-inline text-white small font-weight-bold" style="font-size: 1rem;">Hesabım</span>
+                                    <img class="img-profile rounded-circle" src="@profilResimYolu">
+                                </a>
+                                <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in p-3" style="width: 280px;">
+
+                                    <!-- Kullanıcı Bilgisi -->
+                                    <div class="text-center mb-3">
+                                        <img src="@profilResimYolu" class="rounded-circle mb-2" style="width:60px; height:60px; object-fit:cover;">
+                                        <h6 class="font-weight-bold text-gray-800">@User.Identity.Name</h6>
                                     </div>
-                                </form>
-                            </div>
-                        </li>
 
-                        <!-- Nav Item - Kampanya Mesajları -->
-                        <li class="nav-item dropdown no-arrow mx-1">
-                            <a class="nav-link dropdown-toggle" href="#" id="messagesDropdown" role="button"
-                               data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                <i class="fas fa-envelope fa-fw"></i>
-
-                                <!-- DİNAMİK SAYAÇ -->
-                                @if (bildirimler.Count > 0)
-                                {
-                                <span class="badge badge-danger badge-counter">@bildirimler.Count</span>
-                                }
-                            </a>
-
-                            <!-- Açılır Liste -->
-                            <div class="dropdown-list dropdown-menu dropdown-menu-right shadow animated--grow-in"
-                                 aria-labelledby="messagesDropdown">
-                                <h6 class="dropdown-header">
-                                    Kampanyalar & Bildirimler
-                                </h6>
-
-                                <!-- DÖNGÜ BAŞLIYOR -->
-                                @foreach (var mesaj in bildirimler)
-                                {
-                                <!-- İŞTE BURASI DEĞİŞTİ: href içine Url.Action ile ID gönderiyoruz -->
-                                <a class="dropdown-item d-flex align-items-center" href="@Url.Action("MesajOku", "Home", new { id=mesaj.Id })">
-                                    <div class="dropdown-list-image mr-3">
-                                        <!-- İkon ve Arka Plan Rengi -->
-                                        <div class="rounded-circle @mesaj.RenkClass d-flex align-items-center justify-content-center" style="width:40px; height:40px;">
-                                            <i class="@mesaj.ResimYolu text-white"></i>
-                                        </div>
+                                    <!-- Tema Seçici (ÖZELLEŞTİRME) -->
+                                    <div class="mb-3 text-center">
+                                        <p class="text-xs font-weight-bold text-primary text-uppercase mb-1">Tema Rengi</p>
+                                        <span class="theme-circle" style="background: linear-gradient(90deg, #4e73df, #224abe);" onclick="changeTheme('blue')"></span>
+                                        <span class="theme-circle" style="background: linear-gradient(90deg, #e74a3b, #be2617);" onclick="changeTheme('red')"></span>
+                                        <span class="theme-circle" style="background: linear-gradient(90deg, #1cc88a, #13855c);" onclick="changeTheme('green')"></span>
+                                        <span class="theme-circle" style="background: linear-gradient(90deg, #36b9cc, #258391);" onclick="changeTheme('cyan')"></span>
+                                        <span class="theme-circle" style="background: linear-gradient(90deg, #1f1f1f, #000000);" onclick="changeTheme('dark')"></span>
                                     </div>
-                                    <div class="font-weight-bold">
-                                        <div class="text-truncate">@mesaj.Icerik</div>
-                                        <div class="small text-gray-500">@mesaj.Baslik · @mesaj.Zaman</div>
-                                    </div>
-                                </a>
-                                }
-                                <!-- DÖNGÜ BİTİŞİ -->
-                                <!-- TÜM MESAJLAR LİNKİ -->
-                                <a class="dropdown-item text-center small text-gray-500" href="@Url.Action("Mesajlarim", "Home")">Tüm Mesajları Oku</a>
-                            </div>
-                        </li>
 
+                                    @if (User.Identity.IsAuthenticated)
+                                    {
+                                    var _tumKullanicilar = ElektronikSatisProje.Models.VeriYoneticisi.VerileriGetir();
+                                    var _ben = _tumKullanicilar.FirstOrDefault(x => x.KullaniciAdi == User.Identity.Name);
 
-                        <!--Alışveriş sepetinin sistem tarafından tanınmasını ve ilgili sayının tutulmasını sağlayan kodlar-->
-                        <!-- Nav Item - Sepetim (Resimli) -->
-                        <li class="nav-item no-arrow mx-1">
-                            <!-- Dropdown özelliklerini sildik, direkt href verdik -->
-                            <a class="nav-link" href="@Url.Action("Sepet", "Home")" role="button">
+                                    if (_ben != null && _ben.IsAdmin)
+                                    {
+                                    <a class="dropdown-item text-danger font-weight-bold" href="@Url.Action("Index", "Admin")">
+                                        <i class="fas fa-cogs fa-sm fa-fw mr-2"></i> Yönetim Paneli
+                                    </a>
+                                    }
+                                    }
 
-                                <span class="mr-2 d-none d-lg-inline text-gray-600 small font-weight-bold">Sepetim</span>
+                                    <div class="dropdown-divider"></div>
+                                    <a class="dropdown-item" href="~/Home/Profil"><i class="fas fa-user fa-sm fa-fw mr-2 text-gray-400"></i> Profilim</a>
 
-                                <img src="~/Content/image/sembol_sepet.png" alt="Sepet" style="height: 35px; width: auto; object-fit: contain;">
+                                    <a class="dropdown-item" href="@Url.Action("Gecmis_Siparislerim", "Home")">
+                                        <i class="fas fa-box fa-sm fa-fw mr-2 text-gray-400"></i> Siparişlerim
 
-                                <span class="badge badge-danger badge-counter" id="cartItemCount" style="margin-left: -10px; margin-top: -10px; display: none;">0</span>
-                            </a>
-                        </li>
-                        <!--Alışveriş sepetinin sistem tarafından tanınmasını ve ilgili sayının tutulmasını sağlayan kodlar-->
+                                        <!-- Sayı varsa hemen yanına (ml-2 boşluğuyla) koyuyoruz -->
+                                        @if (siparisSayisi > 0)
+                                        {
+                                        <span class="badge badge-info badge-pill ml-2">@siparisSayisi</span>
+                                        }
+                                    </a>
 
-                        <div class="topbar-divider d-none d-sm-block"></div>
+                                    <a class="dropdown-item" href="@Url.Action("Mesajlarim", "Home")">
+                                        <i class="fas fa-envelope fa-sm fa-fw mr-2 text-gray-400"></i> Mesajlar
+                                        @if (bildirimler.Count > 0)
+                                        {<span class="badge badge-danger ml-2">@bildirimler.Count</span>}
+                                    </a>
+                                    <div class="dropdown-divider"></div>
+                                    <a class="dropdown-item text-danger" href="#" data-toggle="modal" data-target="#logoutModal">
+                                        <i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-danger"></i> Çıkış Yap
+                                    </a>
+                                </div>
+                            </li>
 
-                        <!-- Nav Item - User Information -->
-                        <li class="nav-item dropdown no-arrow">
-                            <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button"
-                               data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                <span class="mr-2 d-none d-lg-inline text-gray-600 small">Hesap İşlemleri</span>
-
-                                <!------Profil resminin kaydının tutulması için dinamik yol veriyoruz-->
-                                <img class="img-profile rounded-circle"
-                                     src="@ElektronikSatisProje.Controllers.HomeController.MevcutProfil.ResimYolu"
-                                     style="width: 40px; height: 40px; object-fit: cover;" />
-
-                            </a>
-                            <!-- Dropdown - User Information -->
-                            <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in"
-                                 aria-labelledby="userDropdown">
-                                <a class="dropdown-item" href="~/Home/Profil">
-                                    <i class="fas fa-user fa-sm fa-fw mr-2 text-gray-400"></i>
-                                    Profil
-                                </a>
-
-
-                                <!--Settings butonunun linki burası-->
-                                <a class="dropdown-item" href="@Url.Action("Settings", "Home")">
-                                    <i class="fas fa-cogs fa-sm fa-fw mr-2 text-gray-400"></i>
-                                    Ayarlar
-                                </a>
-
-
-
-                                <div class="dropdown-divider"></div>
-                                <a class="dropdown-item" href="#" data-toggle="modal" data-target="#logoutModal">
-                                    <i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i>
-                                    Logout
-                                </a>
-                            </div>
-                        </li>
-
-                    </ul>
-
-                </nav>
-                <!-- End of Topbar -->
-                <!-- Begin Page Content -->
-                <div class="container-fluid">
-
-                    <!-- Index.cshtml içeriği buraya gelecek -->
-                    @RenderBody()
-
+                        </ul>
+                    </div>
                 </div>
-                <!-- /.container-fluid -->
+            </nav>
 
+            <!-- İÇERİK ALANI -->
+            <div class="main-content container fade-in">
+                @RenderBody()
             </div>
-            <!-- End of Main Content -->
+
             <!-- Footer Bölümü-->
             <footer class="sticky-footer bg-white border-top mt-5">
                 <div class="container my-auto">
@@ -368,9 +672,9 @@
                         <div class="col-md-4 mb-4">
                             <h6 class="font-weight-bold">Hızlı Erişim</h6>
                             <ul class="list-unstyled small">
-                                <li><a href="@Url.Action("Index", "Home")">Ana Sayfa</a></li>                                                         
-                                <li><a href="@Url.Action("Bilgisayarlar", "Home")">Bilgisayarlar</a></li>                                            
-                                <li><a href="@Url.Action("Switchler", "Home")">Switchler</a></li>                                    
+                                <li><a href="@Url.Action("Index", "Home")">Ana Sayfa</a></li>
+                                <li><a href="@Url.Action("Bilgisayarlar", "Home")">Bilgisayarlar</a></li>
+                                <li><a href="@Url.Action("Switchler", "Home")">Switchler</a></li>
                                 <li><a href="@Url.Action("İletisim", "Home")">İletişim</a></li>
                             </ul>
                         </div>
@@ -389,175 +693,221 @@
                 </div>
             </footer>
             <!-- End of Footer -->
-
-        </div>
-        <!-- End of Content Wrapper -->
-
-    </div>
-    <!-- End of Page Wrapper -->
-    <!-- Scroll to Top Button-->
-    <a class="scroll-to-top rounded" href="#page-top">
-        <i class="fas fa-angle-up"></i>
-    </a>
-
-    <!-- Logout Modal-->
-    <div class="modal fade" id="logoutModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
-         aria-hidden="true">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel">Ready to Leave?</h5>
-                    <button class="close" type="button" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">×</span>
-                    </button>
-                </div>
-                <div class="modal-body">Select "Logout" below if you are ready to end your current session.</div>
-                <div class="modal-footer">
-                    <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
-                    <a class="btn btn-primary" href="@Url.Action("Logout", "Login")">Logout</a>
+            <!-- Logout Modal-->
+            <div class="modal fade" id="logoutModal" tabindex="-1" role="dialog" aria-hidden="true">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">Çıkış</h5>
+                            <button class="close" type="button" data-dismiss="modal"><span>×</span></button>
+                        </div>
+                        <div class="modal-body">Oturumunuzu kapatmak istiyor musunuz?</div>
+                        <div class="modal-footer">
+                            <button class="btn btn-secondary" type="button" data-dismiss="modal">İptal</button>
+                            <a class="btn btn-primary" href="@Url.Action("Logout", "Login")">Çıkış Yap</a>
+                        </div>
+                    </div>
                 </div>
             </div>
-        </div>
-    </div>
 
-    <!-- Bootstrap core JavaScript-->
-    <script src="~/Content/Templates/Tema/JS/jquery.min.js"></script>
-    <script src="~/Content/Templates/Tema/JS/bootstrap.bundle.min.js"></script>
+            <!-- Scriptler -->
+            <!-- ÖNCE JQUERY VE BOOTSTRAP (Bunlar zaten vardır, sıralama önemli) -->
+            <script src="~/Content/Templates/Tema/JS/jquery.min.js"></script>
+            <script src="~/Content/Templates/Tema/JS/bootstrap.bundle.min.js"></script>
+            <script src="~/Content/Templates/Tema/JS/jquery.easing.min.js"></script>
+            <script src="~/Content/Templates/Tema/JS/tema-2.js"></script>
 
-    <!-- Core plugin JavaScript-->
-    <script src="~/Content/Templates/Tema/JS/jquery.easing.min.js"></script>
+            @RenderSection("Scripts", required: false)
 
-    <!-- Custom scripts for all pages-->
-    <script src="~/Content/Templates/Tema/JS/tema-2.js"></script>
+            <!-- KİŞİYE ÖZEL AYARLAR VE CANLI ARAMA (Hepsi Tek Script İçinde) -->
+            <script>
+                // 1. KULLANICI AYARLARI
+                var rawUser = '@User.Identity.Name';
+                var activeUser = rawUser ? rawUser : "Misafir";
+                var cartKey = 'cart_' + activeUser;
+                var themeKey = 'siteTheme_' + activeUser;
 
-    <!-- Sayfaya özel scriptler buraya inject edilecek -->
-    @RenderSection("Scripts", required: false)
+                $(document).ready(function () {
+                    // Tema Yükle
+                    var savedTheme = localStorage.getItem(themeKey);
+                    if (savedTheme) applyTheme(savedTheme);
 
-
-    <!-----------------------------------------Tema Yönetim Kodları-------------------------------------------------------------->
-
-    <script>
-        $(document).ready(function () {
-            calculateCartTotal(); // Sayfa açılınca sayıyı hesapla
-
-            // Diğer tema ayarları...
-            var savedColor = localStorage.getItem('sidebarColor') || 'primary';
-            applySidebarColor(savedColor);
-            updateColorSelectionUI(savedColor);
-
-            var savedDarkMode = localStorage.getItem('darkMode');
-            if (savedDarkMode === 'true') toggleDarkMode(true);
-        });
-
-        // --- 1. SEPETE ÜRÜN EKLEME (Detaylı) ---
-        // Artık bu fonksiyon isim, resim ve fiyat bilgisi alıyor
-        function addToCart(productName, price, imagePath) {
-            // 1. Mevcut sepeti çek (Yoksa boş liste oluştur)
-            var cart = JSON.parse(localStorage.getItem('myShoppingCart')) || [];
-
-            // 2. Bu ürün zaten sepette var mı kontrol et
-            var existingProduct = cart.find(x => x.name === productName);
-
-            if (existingProduct) {
-                // Varsa: Adedini artır
-                existingProduct.quantity++;
-            } else {
-                // Yoksa: Yeni ürün olarak listeye ekle
-                cart.push({
-                    name: productName,
-                    price: price,
-                    image: imagePath,
-                    quantity: 1
+                    // Sepet Hesapla
+                    if (rawUser !== "") calculateCartTotal();
+                    else $('#cartItemCount').hide();
                 });
-            }
 
-            // 3. Listeyi tekrar hafızaya kaydet
-            localStorage.setItem('myShoppingCart', JSON.stringify(cart));
+                // 2. CANLI ARAMA FONKSİYONU (liveSearch)
+                function liveSearch(input) {
+                    var term = input.value;
+                    var resultBox = document.getElementById("searchResults");
 
-            // 4. Rozeti güncelle
-            calculateCartTotal();
+                    if (term.length < 2) {
+                        if (resultBox) resultBox.style.display = "none";
+                        return;
+                    }
 
-            // Ufak bir bildirim (İstersen SweetAlert kullanabilirsin)
-            // alert(productName + " sepete eklendi!");
-        }
+                    $.ajax({
+                        url: '@Url.Action("CanliArama", "Home")',
+                        type: 'GET',
+                        data: { term: term },
+                        success: function (data) {
+                            if (!resultBox) return;
 
-        // --- 2. SEPET TOPLAMINI HESAPLA VE YAZ ---
-        function calculateCartTotal() {
-            var cart = JSON.parse(localStorage.getItem('myShoppingCart')) || [];
+                            if (data.length === 0) {
+                                resultBox.innerHTML = '<div class="p-3 text-muted text-center small">Sonuç bulunamadı.</div>';
+                                resultBox.style.display = "block";
+                                return;
+                            }
 
-            // Tüm ürünlerin adetlerini topla (Örn: 2 Laptop + 1 Telefon = 3)
-            var totalCount = 0;
-            cart.forEach(function (item) {
-                totalCount += item.quantity;
-            });
+                            var html = "";
+                            data.forEach(function (item) {
+                                var url = '/Home/UrunDetay/' + item.Id;
+                                html += `
+                                                    <a href="${url}" class="search-item">
+                                                        <img src="${item.ResimYolu}" class="search-thumb">
+                                                        <div class="search-info">
+                                                            <h6>${item.Ad}</h6>
+                                                            <span>${item.Fiyat}</span>
+                                                        </div>
+                                                    </a>
+                                                `;
+                            });
 
-            // Rozeti güncelle
-            $('#cartItemCount').text(totalCount);
-
-            if (totalCount > 0) {
-                $('#cartItemCount').show();
-            } else {
-                $('#cartItemCount').hide();
-            }
-        }
-
-        // --- 3. TEMA FONKSİYONLARI ---
-        function changeSidebarColor(color, element) {
-            localStorage.setItem('sidebarColor', color);
-            applySidebarColor(color);
-            if (element) {
-                $('.theme-color-box').removeClass('selected-theme');
-                $('.check-icon').addClass('d-none');
-                $(element).addClass('selected-theme');
-                $(element).find('.check-icon').removeClass('d-none');
-            }
-        }
-
-        function applySidebarColor(color) {
-            var sidebar = $('#accordionSidebar');
-            sidebar.removeClass('bg-gradient-primary bg-gradient-danger bg-gradient-success bg-gradient-dark bg-gradient-warning');
-            sidebar.addClass('bg-gradient-' + color);
-
-            var searchBtns = $('.theme-search-btn');
-            searchBtns.removeClass('btn-primary btn-danger btn-success btn-dark btn-warning');
-            searchBtns.addClass('btn-' + color);
-        }
-
-        function updateColorSelectionUI(color) {
-            if ($('.theme-color-box').length > 0) {
-                $('.theme-color-box').removeClass('selected-theme');
-                $('.check-icon').addClass('d-none');
-                var targetBox = $(".theme-color-box[onclick*='" + color + "']");
-                if (targetBox.length > 0) {
-                    targetBox.addClass('selected-theme');
-                    targetBox.find('.check-icon').removeClass('d-none');
+                            resultBox.innerHTML = html;
+                            resultBox.style.display = "block";
+                        },
+                        error: function () { console.log("Arama hatası"); }
+                    });
                 }
-            }
-        }
 
-        function toggleDarkMode(isDark) {
-            if (isDark) {
-                $('body').addClass('dark-mode');
-                localStorage.setItem('darkMode', 'true');
-                if ($('#option2').length > 0) {
-                    $('#option2').prop('checked', true);
-                    $('#option2').parent().addClass('active');
-                    $('#option1').parent().removeClass('active');
+                // Dışarı tıklayınca kapat
+                document.addEventListener('click', function (event) {
+                    var box = document.getElementById("searchResults");
+                    var input = document.getElementById("liveSearchInput");
+                    if (box && event.target !== box && event.target !== input) {
+                        box.style.display = "none";
+                    }
+                });
+
+                // 3. TEMA VE SEPET FONKSİYONLARI
+                function changeTheme(color) {
+                    applyTheme(color);
+                    localStorage.setItem(themeKey, color);
                 }
-            } else {
-                $('body').removeClass('dark-mode');
-                localStorage.setItem('darkMode', 'false');
-                if ($('#option1').length > 0) {
-                    $('#option1').prop('checked', true);
-                    $('#option1').parent().addClass('active');
-                    $('#option2').parent().removeClass('active');
+
+                function applyTheme(color) {
+                    var themes = {
+                        'blue': 'linear-gradient(90deg, #4e73df, #224abe)',
+                        'red': 'linear-gradient(90deg, #e74a3b, #be2617)',
+                        'green': 'linear-gradient(90deg, #1cc88a, #13855c)',
+                        'cyan': 'linear-gradient(90deg, #36b9cc, #258391)',
+                        'dark': 'linear-gradient(90deg, #1f1f1f, #000000)'
+                    };
+                    var navbar = document.getElementById('mainNavbar');
+                    if (navbar && themes[color]) {
+                        navbar.style.background = themes[color];
+                    }
                 }
-            }
-        }
-    </script>
 
-    <!-----------------------------------------Tema Yönetim Kodları-------------------------------------------------------------->
+                function addToCart(productName, price, imagePath) {
+                    if (rawUser === "") {
+                        // SweetAlert varsa onu kullan, yoksa alert
+                        if (typeof Swal !== 'undefined') {
+                            Swal.fire({ icon: 'warning', title: 'Giriş Yapmalısınız', text: 'Sepete eklemek için lütfen giriş yapın.' })
+                                .then(() => { window.location.href = '@Url.Action("Index", "Login")'; });
+                        } else {
+                            alert("Lütfen giriş yapınız.");
+                            window.location.href = '@Url.Action("Index", "Login")';
+                        }
+                        return;
+                    }
+                    var cart = JSON.parse(localStorage.getItem(cartKey)) || [];
+                    var existingProduct = cart.find(x => x.name === productName);
+                    if (existingProduct) existingProduct.quantity++;
+                    else cart.push({ name: productName, price: price, image: imagePath, quantity: 1 });
+                    localStorage.setItem(cartKey, JSON.stringify(cart));
+                    calculateCartTotal();
 
+                    // Bildirim
+                    if (typeof showNotification === 'function') showNotification('success', productName + ' sepete eklendi!');
+                }
 
-</body>
-</html>
+                function calculateCartTotal() {
+                    if (rawUser === "") return;
+                    var cart = JSON.parse(localStorage.getItem(cartKey)) || [];
+                    var totalCount = 0;
+                    cart.forEach(item => totalCount += item.quantity);
+                    $('#cartItemCount').text(totalCount);
+                    if (totalCount > 0) $('#cartItemCount').show(); else $('#cartItemCount').hide();
+                }
+
+                // --- SLOGAN ANİMASYONU ---
+                const slogans = [
+                    "Teknolojinin Yeni Adresi",
+                    "Bugüne Özel Fırsatlar",
+                    "Hızlı ve Güvenli Kargo",
+                    "Müşteri Memnuniyeti Garantisi"
+                ];
+
+                let sloganIndex = 0;
+
+                function rotateSlogan() {
+                    var sloganElement = document.getElementById("dynamicSlogan");
+                    if (!sloganElement) return;
+
+                    // 1. Önce yazıyı gizle (Opaklık 0)
+                    sloganElement.style.opacity = "0";
+
+                    setTimeout(function () {
+                        // 2. Yazıyı değiştir
+                        sloganElement.innerText = slogans[sloganIndex];
+
+                        // 3. Yazıyı göster (Opaklık 1)
+                        sloganElement.style.opacity = "1";
+
+                        // Sıradaki slogana geç (Başa dönmeli döngü)
+                        sloganIndex = (sloganIndex + 1) % slogans.length;
+                    }, 500); // Yarım saniye bekle (Silinme efekti için)
+                }
+
+                // Sayfa açılınca başlat ve her 4 saniyede bir değiştir
+                setInterval(rotateSlogan, 4000);
+                rotateSlogan(); // İlk açılışta hemen çalışsın
+
+                // --- FAVORİ EKLE/ÇIKAR FONKSİYONU ---
+                function toggleFav(id, btnElement) {
+                    // Giriş yapmamışsa uyar
+                    if (activeUser === "") {
+                        alert("Favorileri kullanmak için lütfen giriş yapınız.");
+                        return;
+                    }
+
+                    $.ajax({
+                        url: '@Url.Action("FavoriIslemi", "Home")', // Controller'daki metot
+                        type: 'POST',
+                        data: { id: id },
+                        success: function (response) {
+                            if (response.success) {
+                                // İkonun rengini değiştir (Kırmızı/Gri)
+                                if (response.islem === "eklendi") {
+                                    $(btnElement).addClass("active");
+                                    // Opsiyonel: Toast Bildirim
+                                    if (typeof showNotification === 'function') showNotification('success', 'Favorilere eklendi!');
+                                } else {
+                                    $(btnElement).removeClass("active");
+                                    if (typeof showNotification === 'function') showNotification('info', 'Favorilerden çıkarıldı.');
+                                }
+                            } else {
+                                alert(response.message);
+                            }
+                        },
+                        error: function () {
+                            console.log("Favori işlemi hatası");
+                        }
+                    });
+                }
+
+            </script>
+        </body>
+    </html>

@@ -1,0 +1,138 @@
+﻿
+@{
+    Layout = null;
+}
+
+<!-- BU KISMI HEAD TARAFINA EKLEMEZSEN STİL GELMEZ -->
+<!-- SB Admin 2 CSS CDN (Stillerin çalışması için gerekli) -->
+<link href="~/Content/Templates/Tema/CSS/tema-2.min.css" rel="stylesheet" />
+<link href="~/Content/Templates/Tema/CSS/all.min.css" rel="stylesheet" />
+
+<!-- jQuery kütüphanesi (</body> etiketinden hemen önce veya <head> içinde) -->
+<script src="@Url.Content("~/Content/Templates/Tema/JS/jquery.min.js")"></script>
+
+<!-- SAYFA İÇERİĞİ -->
+<div class="container">
+
+    <!-- Dış Çerçeve (Ortalama için) -->
+    <div class="row justify-content-center">
+
+        <div class="col-xl-6 col-lg-7 col-md-9">
+
+            <!-- O Beyaz Kart Yapısı (Card) -->
+            <div class="card o-hidden border-0 shadow-lg my-5">
+                <div class="card-body p-0">
+                    <!-- İçerik Alanı -->
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <div class="p-5">
+
+                                <!-- Başlık Alanı -->
+                                <div class="text-center">
+                                    <h1 class="h4 text-gray-900 mb-4">Bir Hesap Oluştur!</h1>
+                                    <p class="mb-4" style="font-size: 0.9rem; color: #858796;">
+                                        Hemen aramıza katılın ve avantajlardan yararlanmaya başlayın.
+                                    </p>
+                                </div>
+
+                                <!-- Mesajın çıkacağı alan (Formun hemen üstü) -->
+                                <div id="divMessage" class="text-center mb-3" style="display:none;">
+                                    <!-- Buraya JS ile yazı yazacağız -->
+                                    <h4 style="font-weight:bold;"></h4>
+                                </div>
+
+                                <!-- FORM -->
+                                <form class="user" id="frmRegister">
+                                    <!-- 1. Mail (En üstte) -->
+                                    <div class="form-group">
+                                        <input type="email" class="form-control form-control-user"
+                                               name="Email"
+                                               placeholder="E-Posta Adresi..." required>
+                                    </div>
+
+                                    <!-- 2. Kullanıcı Adı (Ortada) -->
+                                    <div class="form-group">
+                                        <input type="text" class="form-control form-control-user"
+                                               name="Username"
+                                               placeholder="Kullanıcı Adı..." required>
+                                    </div>
+
+                                    <!-- 3. Şifre (En altta) -->
+                                    <div class="form-group">
+                                        <input type="password" class="form-control form-control-user"
+                                               name="Password"
+                                               placeholder="Şifre..." required>
+                                    </div>
+
+                                    <!-- Kayıt Ol Butonu -->
+                                    <button type="button" class="btn btn-primary btn-user btn-block" onclick="RegisterRequest()">Kayıt Ol</button>
+                                </form>
+                                <!--/Login/KayitOl-->
+
+                                <hr>
+
+                                <!-- Tek Link: Giriş Ekranına Dön -->
+                                <div class="text-center">
+                                    <a class="small" href="/Login/Index">Giriş Ekranına Dön</a>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<script>
+    function RegisterRequest() {
+        var form = $('#frmRegister');
+        var msgDiv = $("#divMessage");      // Kutunun kendisi
+        var msgText = $("#divMessage h4");  // Yazının yazılacağı başlık
+
+        // HTML5 Boş alan kontrolü (Kutular boşsa işlem yapma)
+        if (!document.getElementById('frmRegister').checkValidity()) {
+            document.getElementById('frmRegister').reportValidity();
+            return;
+        }
+
+        $.ajax({
+            url: '@Url.Action("KayitOL", "Login")',
+            type: 'POST',
+            data: form.serialize(),
+            success: function (response) {
+                // Kutuyu görünür yap
+                msgDiv.show();
+
+                if (response.IsSuccess) {
+                    // --- BAŞARILI (YEŞİL) ---
+                    msgText.css("color", "#1cc88a"); // Yeşil Renk
+                    msgText.text(response.Message);  // "Kayıt başarı ile oluşturuldu."
+
+                    // Formu temizle (Kutuları boşalt)
+                    document.getElementById("frmRegister").reset();
+
+                    // 2 saniye sonra Giriş Ekranına yönlendir
+                    setTimeout(function() {
+                        window.location.href = '@Url.Action("Index", "Login")';
+                    }, 3000);
+
+                } else {
+                    // --- HATALI (KIRMIZI) ---
+                    msgText.css("color", "#e74a3b"); // Kırmızı Renk
+                    msgText.text(response.Message);  // "Email yetkili değil" vb.
+                }
+            },
+            error: function () {
+                // Sunucu hatası
+                msgDiv.show();
+                msgText.css("color", "red");
+                msgText.text("Sunucu ile iletişim hatası oluştu.");
+            }
+        });
+    }
+</script>

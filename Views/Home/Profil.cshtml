@@ -24,7 +24,7 @@
                         <img id="profilePic" class="pic"
                              src="@Model.ResimYolu"
                              onerror="this.onerror=null; this.src='/Content/image/user_circle.png';">
-                        
+
 
                         <!-- Yükleme İkonu (Overlay) -->
                         <input class="uploadProfileInput" type="file" name="profile_pic" id="newProfilePhoto" accept="image/*" style="opacity: 0;" />
@@ -47,119 +47,209 @@
                 <span class="badge badge-success px-3 py-2 mb-4">Aktif Üye</span>
             </div>
 
-            <!-- Sol Menü -->
+            <!-- Profilden ve Hesap Kutucuğundan Erişilen Geçmiş Siparişlerim -->
             <div class="list-group list-group-flush">
-                <a href="#" class="list-group-item list-group-item-action active bg-primary text-white border-0">
+                <a href="#" class="list-group-item list-group-item-action" onclick="$('#p-tab').tab('show'); return false;">
                     <i class="fas fa-user-circle mr-2"></i> Kullanıcı Bilgilerim
                 </a>
-                <a href="@Url.Action("Gecmis_Siparislerim", "Home")" class="list-group-item list-group-item-action">
-                    <i class="fas fa-shopping-bag mr-2"></i> Siparişlerim
-                    <span class="badge badge-danger badge-pill float-right">12</span>
-                </a>
-                <a href="#" class="list-group-item list-group-item-action">
+
+                <!-- ... Siparişlerim (Aynı kalsın) ... -->
+                <!-- 2. Adres Bilgilerim Linki -->
+                <a href="#" class="list-group-item list-group-item-action" onclick="$('#a-tab').tab('show'); return false;">
                     <i class="fas fa-map-marker-alt mr-2"></i> Adres Bilgilerim
                 </a>
-                <a href="#" class="list-group-item list-group-item-action">
+
+                <!-- 3. Favori Ürünlerim Linki -->
+                <a href="#" class="list-group-item list-group-item-action" onclick="$('#f-tab').tab('show'); return false;">
                     <i class="fas fa-heart mr-2"></i> Favori Ürünlerim
                 </a>
-                <!-- Şifre Değiştirme Modalını Tetikleyen Link -->
-                <a href="#" class="list-group-item list-group-item-action" data-toggle="modal" data-target="#passwordModal">
-                    <i class="fas fa-key mr-2"></i> Şifre Değiştir
-                </a>
-                <a href="#" class="list-group-item list-group-item-action text-danger" data-toggle="modal" data-target="#logoutModal">
-                    <i class="fas fa-sign-out-alt mr-2"></i> Çıkış Yap
-                </a>
             </div>
         </div>
     </div>
 
-    <!-- SAĞ KOLON: Form Alanı -->
+
+     <!-- SAĞ KOLON: Sekmeli Yapı -->
     <div class="col-xl-8 col-lg-7">
         <div class="card shadow mb-4">
-            <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                <h6 class="m-0 font-weight-bold text-primary">Kullanıcı Bilgilerim</h6>
-                <button class="btn btn-sm btn-primary shadow-sm" id="btnEnableEdit" onclick="toggleEdit()">
-                    <i class="fas fa-pen fa-sm text-white-50"></i> Düzenle
-                </button>
+            <div class="card-header py-3">
+
+                <!-- SEKME BAŞLIKLARI (NAV TABS) -->
+                <!-- ID'lere Dikkat: p-tab, a-tab, f-tab -->
+                <ul class="nav nav-tabs card-header-tabs" id="profileTabs" role="tablist">
+                    <li class="nav-item">
+                        <a class="nav-link active font-weight-bold" id="p-tab" data-toggle="tab" href="#profile" role="tab">Kullanıcı Bilgileri</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link font-weight-bold" id="a-tab" data-toggle="tab" href="#address" role="tab">Adres Bilgilerim</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link font-weight-bold" id="f-tab" data-toggle="tab" href="#favorites" role="tab">Favorilerim</a>
+                    </li>
+                </ul>
+
             </div>
+
             <div class="card-body">
-                <form>
-                    <div class="form-row">
-                        <div class="form-group col-md-6">
-                            <label class="small mb-1 font-weight-bold">Ad</label>
-                            <input type="text" class="form-control" id="inputName" value="@Model.Ad" disabled>
-                        </div>
-                        <div class="form-group col-md-6">
-                            <label class="small mb-1 font-weight-bold">Soyad</label>
-                            <input type="text" class="form-control" id="inputSurname" value="@Model.Soyad" disabled>
-                        </div>
-                    </div>
+                <div class="tab-content">
 
-                    <div class="form-row">
-                        <div class="form-group col-md-6">
-                            <label class="small mb-1 font-weight-bold">E-Posta Adresi</label>
-                            <input type="email" class="form-control" id="inputEmail" value="@Model.Email" disabled>
-                        </div>
-                        <div class="form-group col-md-6">
-                            <label class="small mb-1 font-weight-bold">Telefon Numarası</label>
-                            <input type="tel" class="form-control" id="inputPhone" value="@Model.Telefon" disabled>
-                        </div>
-                    </div>
-
-                    <div class="form-row">
-                        <div class="form-group col-md-6">
-                            <label class="small mb-1 font-weight-bold">Şehir / Konum</label>
-                            <input type="text" class="form-control" id="inputCity" value="@Model.Sehir" disabled>
-                        </div>
-                        <div class="form-group col-md-6">
-                            <label class="small mb-1 font-weight-bold">Doğum Tarihi</label>
-                            <input type="date" class="form-control" id="inputBirthday" value="1995-05-19" disabled>
-                        </div>
-                    </div>
-
-                    <button type="button" id="btnSave" class="btn btn-success mt-3" style="display:none;" onclick="saveChanges()">
-                        <i class="fas fa-save mr-1"></i> Değişiklikleri Kaydet
-                    </button>
-                </form>
-            </div>
-        </div>
-
-        <!-- Alt İstatistik Kartları -->
-        <div class="row">
-            <div class="col-md-6 mb-4">
-                <div class="card border-left-warning shadow h-100 py-2">
-                    <div class="card-body">
-                        <div class="row no-gutters align-items-center">
-                            <div class="col mr-2">
-                                <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">Kazanılan Puan</div>
-                                <div class="h5 mb-0 font-weight-bold text-gray-800">1.250 Puan</div>
+                    <!-- 1. SEKME İÇERİĞİ: PROFİL (ID: profile) -->
+                    <div class="tab-pane fade show active" id="profile" role="tabpanel">
+                        <form>
+                            <div class="form-row">
+                                <div class="form-group col-md-6">
+                                    <label class="small font-weight-bold">Ad</label>
+                                    <input type="text" class="form-control" id="inputName" value="@Model.Ad" disabled>
+                                </div>
+                                <div class="form-group col-md-6">
+                                    <label class="small font-weight-bold">Soyad</label>
+                                    <input type="text" class="form-control" id="inputSurname" value="@Model.Soyad" disabled>
+                                </div>
                             </div>
-                            <div class="col-auto">
-                                <i class="fas fa-coins fa-2x text-gray-300"></i>
+                            <!-- Diğer inputlar... -->
+                            <div class="form-group">
+                                <label class="small font-weight-bold">Email</label>
+                                <input type="text" class="form-control" value="@Model.Email" disabled>
                             </div>
-                        </div>
+
+                            <button type="button" class="btn btn-primary btn-sm" onclick="toggleEdit()" id="btnEnableEdit">Düzenle</button>
+                            <button type="button" class="btn btn-success btn-sm" onclick="saveChanges()" id="btnSave" style="display:none;">Kaydet</button>
+                        </form>
                     </div>
+
+                    <!-- 2. SEKME İÇERİĞİ: ADRES (ID: address) -->
+                    <div class="tab-pane fade" id="address" role="tabpanel">
+                        <!-- Adres Listesi -->
+                        <div class="row">
+                            @if (Model.Adresler != null)
+                            {
+                                foreach (var item in Model.Adresler)
+                                {
+                                    <div class="col-md-6 mb-3">
+                                        <div class="card border-left-primary h-100 shadow-sm">
+                                            <div class="card-body py-2">
+                                                <div class="d-flex justify-content-between">
+                                                    <h6 class="font-weight-bold text-primary">@item.Baslik</h6>
+                                                    <i class="fas fa-trash text-danger" style="cursor:pointer;" onclick="adresSil('@item.Baslik')"></i>
+                                                </div>
+                                                <small class="text-muted">@item.Sehir / @item.Ilce <br> @item.AcikAdres</small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+                            }
+                        </div>
+                        <hr>
+                        <h6>Yeni Adres Ekle</h6>
+                        <form id="frmAdres">
+                            <div class="form-row">
+                                <div class="col-4"><input name="Baslik" class="form-control form-control-sm" placeholder="Başlık" required></div>
+                                <div class="col-4"><input name="Sehir" class="form-control form-control-sm" placeholder="Şehir" required></div>
+                                <div class="col-4"><input name="Ilce" class="form-control form-control-sm" placeholder="İlçe" required></div>
+                            </div>
+                            <textarea name="AcikAdres" class="form-control form-control-sm mt-2" rows="2" placeholder="Adres..." required></textarea>
+                            <button type="button" class="btn btn-success btn-sm btn-block mt-2" onclick="adresKaydet()">Kaydet</button>
+                        </form>
+                    </div>
+
+                    <!-- 3. SEKME İÇERİĞİ: FAVORİLER (ID: favorites) -->
+                    <div class="tab-pane fade" id="favorites" role="tabpanel">
+                        @{ var favList = ViewBag.Favoriler as List<ElektronikSatisProje.Models.Urun>; }
+                        @if (favList != null && favList.Count > 0)
+                        {
+                            <div class="row">
+                                @foreach (var u in favList)
+                                {
+                                    <div class="col-6 mb-3">
+                                        <div class="card border-0 shadow-sm">
+                                            <div class="card-body p-2 text-center">
+                                                <img src="@u.ResimYolu" style="height:60px;">
+                                                <h6 class="small mt-2">@u.Ad</h6>
+                                                <button class="btn btn-danger btn-sm py-0" onclick="toggleFav(@u.Id, this)">Kaldır</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                        }
+                        else
+                        {
+                            <p class="text-center text-muted">Favori ürününüz yok.</p>
+                        }
+                    </div>
+
                 </div>
             </div>
-
-            <div class="col-md-6 mb-4">
-                <div class="card border-left-info shadow h-100 py-2">
-                    <div class="card-body">
-                        <div class="row no-gutters align-items-center">
-                            <div class="col mr-2">
-                                <div class="text-xs font-weight-bold text-info text-uppercase mb-1">Bekleyen Sipariş</div>
-                                <div class="h5 mb-0 font-weight-bold text-gray-800">1 Adet</div>
-                            </div>
-                            <div class="col-auto">
-                                <i class="fas fa-truck-loading fa-2x text-gray-300"></i>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
         </div>
-
     </div>
+
+    <!-- Alt İstatistik Kartları (Aynı kalıyor) -->
+    <div class="row">
+        <div class="col-md-6 mb-4">
+            <div class="card border-left-warning shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">Kazanılan Puan</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">1.250 Puan</div>
+                        </div>
+                        <div class="col-auto"><i class="fas fa-coins fa-2x text-gray-300"></i></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 mb-4">
+            <div class="card border-left-info shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-info text-uppercase mb-1">Bekleyen Sipariş</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">1 Adet</div>
+                        </div>
+                        <div class="col-auto"><i class="fas fa-truck-loading fa-2x text-gray-300"></i></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+    <!-- Alt İstatistik Kartları -->
+    <div class="row">
+        <div class="col-md-6 mb-4">
+            <div class="card border-left-warning shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">Kazanılan Puan</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">1.250 Puan</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-coins fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 mb-4">
+            <div class="card border-left-info shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-info text-uppercase mb-1">Bekleyen Sipariş</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">1 Adet</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-truck-loading fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
 </div>
 
 <!-- ŞİFRE DEĞİŞTİRME MODALI -->
@@ -196,6 +286,7 @@
         </div>
     </div>
 </div>
+
 
 <!-- CSS (Fotoğraf Yükleme Efekti İçin) -->
 <style>
@@ -263,9 +354,33 @@
     .uploadProfileInput {
         display: none;
     }
+
+    /* --- SEKME (TAB) TASARIMI --- */
+
+    /* 1. Normal (Pasif) Durumdaki Yazılar */
+    .nav-tabs .nav-link {
+        color: #5a5c69; /* Koyu Gri (Okunaklı) */
+        background-color: #f8f9fc; /* Hafif Gri Arka Plan */
+        border: 1px solid #eaecf4;
+        font-weight: 700; /* Kalın */
+    }
+
+    /* 2. Aktif (Seçili) Sekme */
+    .nav-tabs .nav-link.active {
+        color: #4e73df !important; /* Mavi Yazı */
+        background-color: #fff !important; /* Beyaz Arka Plan */
+        border-bottom: 2px solid #4e73df; /* Altına Mavi Çizgi */
+    }
+
+    /* 3. Mouse Üzerine Gelince (Hover) */
+    .nav-tabs .nav-link:hover {
+        background-color: #eaecf4;
+        color: #2e59d9;
+    }    
+
 </style>
 
-<!-- JAVASCRIPT -->
+
 <!-- JAVASCRIPT -->
 <script>
     // 1. SAYFA YÜKLENİNCE ÇALIŞACAK KISIM (Event Listenerlar)
@@ -349,10 +464,52 @@
         }
     }
 
-    // 2. Kaydet Butonu
+    // 2. Profil sayfasındaki formdan gelen bilgileri kaydedecek şekilde güncellenmiş function saveChanges
     function saveChanges() {
-        alert("Bilgileriniz başarıyla güncellendi!");
-        toggleEdit();
+
+        // Formdaki verileri topla
+        var profilVerisi = {
+            Ad: document.getElementById('inputName').value,
+            Soyad: document.getElementById('inputSurname').value,
+            // Email'i göndermiyoruz, o değiştirilemez.
+            Telefon: document.getElementById('inputPhone').value,
+            Sehir: document.getElementById('inputCity').value,
+            DogumTarihi: document.getElementById('inputBirthday').value
+        };
+
+        // Butonu pasif yap (Çift tıklamayı önlemek için)
+        var saveBtn = document.getElementById('btnSave');
+        saveBtn.disabled = true;
+        saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Kaydediliyor...';
+
+        // AJAX ile sunucuya gönder
+        $.ajax({
+            url: '@Url.Action("ProfilGuncelle", "Home")',
+            type: 'POST',
+            data: profilVerisi,
+            success: function (response) {
+                if (response.success) {
+                    alert("Bilgileriniz başarıyla güncellendi ve kaydedildi!");
+
+                    // Düzenleme modunu kapat
+                    toggleEdit();
+
+                    // Sol taraftaki isim alanını da anlık güncelle (Opsiyonel Güzellik)
+                    // (Sayfa yenilenmeden ismin değiştiğini görmek için)
+                    $("h4.font-weight-bold").text(profilVerisi.Ad + " " + profilVerisi.Soyad);
+                } else {
+                    alert("Hata: " + response.message);
+                }
+            },
+            error: function () {
+                alert("Sunucu ile iletişim hatası!");
+            },
+            complete: function() {
+                // İşlem bitince butonu eski haline getir
+                saveBtn.disabled = false;
+                saveBtn.innerHTML = '<i class="fas fa-save mr-1"></i> Değişiklikleri Kaydet';
+            }
+        });
     }
 
     // 3. Şifre Değiştirme Fonksiyonu (Senin aradığın yer burası)
@@ -392,4 +549,88 @@
             }
         });
     }
+
+    // --- ADRES İŞLEMLERİ ---
+    function adresKaydet() {
+        var form = $('#frmAdres');
+
+        // Basit validasyon
+        if (!document.getElementById('frmAdres').checkValidity()) {
+            document.getElementById('frmAdres').reportValidity();
+            return;
+        }
+
+        $.ajax({
+            url: '@Url.Action("AdresEkle", "Home")',
+            type: 'POST',
+            data: form.serialize(),
+            success: function (response) {
+                if (response.success) {
+                    alert("Adres başarıyla eklendi!");
+                    location.reload(); // Sayfayı yenile ki liste güncellensin
+                } else {
+                    alert("Hata oluştu.");
+                }
+            }
+        });
+    }
+
+    function adresSil(baslik) {
+        if(confirm(baslik + " başlıklı adresi silmek istediğinize emin misiniz?")) {
+            $.ajax({
+                url: '@Url.Action("AdresSil", "Home")',
+                type: 'POST',
+                data: { baslik: baslik },
+                success: function (response) {
+                    if (response.success) {
+                        location.reload();
+                    }
+                }
+            });
+        }
+    }
+
+    // Sol menüden Adres sekmesini açan fonksiyon
+    function openAddressTab() {
+        // Bootstrap'ın tab fonksiyonunu manuel çağırıyoruz
+        $('#address-tab').tab('show');
+
+        // Sayfayı yukarı kaydırmasın diye
+        return false;
+    }
+
+   
+   // --- FAVORİ SEKMESİNİ AÇMA ---
+    function openFavTab() {
+        // Bootstrap'ın tab fonksiyonunu çağırıyoruz
+        // Eğer jQuery sürümü eskiyse .tab('show') çalışmayabilir
+        // O yüzden önce manuel active class verelim, garanti olsun.
+
+        // 1. Tüm sekmeleri kapat
+        $('.nav-tabs .nav-link').removeClass('active');
+        $('.tab-pane').removeClass('show active');
+
+        // 2. Favori sekmesini aç
+        $('#fav-tab').addClass('active');
+        $('#favorites').addClass('show active');
+
+        return false;
+    }
+
+    function toggleFav(id, btn) {
+        $.ajax({
+            url: '@Url.Action("FavoriIslemi", "Home")',
+            type: 'POST',
+            data: { id: id },
+            success: function (response) {
+                if (response.success) {
+                    // Eğer profildeysek sayfayı yenile ki liste güncellensin
+                    location.reload();
+                } else {
+                    alert(response.message);
+                }
+            }
+        });
+    }
+
 </script>
