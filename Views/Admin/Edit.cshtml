@@ -1,0 +1,120 @@
+﻿
+@model ElektronikSatisProje.Models.Urun
+@{
+    ViewBag.Title = "Ürün Düzenle";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container mt-4">
+    <div class="card shadow mb-4">
+        <div class="card-header py-3 d-flex justify-content-between align-items-center">
+            <h6 class="m-0 font-weight-bold text-primary">Ürün Düzenle: @Model.Ad</h6>
+            <a href="@Url.Action("Index", "Admin")" class="btn btn-sm btn-secondary">Geri Dön</a>
+        </div>
+        <div class="card-body">
+
+            <form action="@Url.Action("Edit", "Admin")" method="post">
+
+                <!-- ID'yi Gizli Taşıyoruz (Çok Önemli!) -->
+                <input type="hidden" name="Id" value="@Model.Id" />
+                <input type="hidden" name="ResimYolu" value="@Model.ResimYolu" />
+                <input type="hidden" name="RozetClass" value="@Model.RozetClass" />
+
+                <div class="row">
+                    <div class="col-md-4 text-center mb-3">
+                        <label>Mevcut Resim</label><br>
+                        <img src="@Model.ResimYolu" class="img-fluid rounded border p-2" style="max-height: 200px;">
+                    </div>
+                    <div class="col-md-8">
+                        <div class="form-group">
+                            <label>Ürün Adı</label>
+                            <input type="text" name="Ad" class="form-control" value="@Model.Ad" required>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group col-md-6">
+                                <label>Fiyat (TL)</label>
+                                <!-- Virgülden sonraki kuruşları bozmamak için ToString formatı -->
+                                <input type="text" name="Fiyat" class="form-control" value="@Model.Fiyat.ToString("0.##")" required>
+                            </div>
+                            <div class="form-group col-md-6">
+                                <label>Rozet</label>
+                                <input type="text" name="Rozet" class="form-control" value="@Model.Rozet">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Açıklama</label>
+                            <textarea name="Aciklama" class="form-control" rows="4">@Model.Aciklama</textarea>
+                        </div>
+
+                        <div class="form-group mt-4 p-3 bg-light rounded border">
+                    <label class="font-weight-bold text-primary">Teknik Özellikler Listesi</label>
+                    <small class="d-block text-muted mb-3">Mevcut özellikleri düzenleyebilir veya yenisini ekleyebilirsiniz.</small>
+
+                    <div id="ozellikler-kutusu">
+                        <!-- MEVCUT ÖZELLİKLERİ LİSTELE -->
+                        @if (Model.TeknikOzellikler != null)
+                        {
+                            foreach (var ozellik in Model.TeknikOzellikler)
+                            {
+                                <div class="form-row mb-2">
+                                    <div class="col-5">
+                                        <input type="text" name="OzellikAdlari" class="form-control font-weight-bold" value="@ozellik.Key" placeholder="Başlık" required>
+                                    </div>
+                                    <div class="col-6">
+                                        <input type="text" name="OzellikDegerleri" class="form-control" value="@ozellik.Value" placeholder="Değer" required>
+                                    </div>
+                                    <div class="col-1">
+                                        <button type="button" class="btn btn-danger btn-circle btn-sm" onclick="this.parentElement.parentElement.remove()">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            }
+                        }
+                    </div>
+                    
+                    <!-- Yeni Satır Ekleme Butonu -->
+                    <button type="button" class="btn btn-sm btn-outline-success mt-2 font-weight-bold" onclick="yeniOzellikEkle()">
+                        <i class="fas fa-plus"></i> Yeni Satır Ekle
+                    </button>
+                </div>
+
+                <hr>
+
+                <!-- JAVASCRIPT -->
+                <script>
+                    function yeniOzellikEkle() {
+                        var html = `
+                            <div class="form-row mb-2">
+                                <div class="col-5">
+                                    <input type="text" name="OzellikAdlari" class="form-control font-weight-bold" placeholder="Başlık">
+                                </div>
+                                <div class="col-6">
+                                    <input type="text" name="OzellikDegerleri" class="form-control" placeholder="Değer">
+                                </div>
+                                <div class="col-1">
+                                    <button type="button" class="btn btn-danger btn-circle btn-sm" onclick="this.parentElement.parentElement.remove()">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                            </div>`;
+                        document.getElementById('ozellikler-kutusu').insertAdjacentHTML('beforeend', html);
+                    }
+                </script>
+
+
+
+                    </div>
+                </div>
+
+                <hr>
+                <button type="submit" class="btn btn-primary btn-lg btn-block">
+                    <i class="fas fa-save mr-2"></i> Değişiklikleri Kaydet
+                </button>
+
+            </form>
+        </div>
+    </div>
+</div>

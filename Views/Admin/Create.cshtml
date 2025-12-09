@@ -1,0 +1,119 @@
+﻿
+@{
+    ViewBag.Title = "Yeni Ürün Ekle";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container mt-4">
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">Yeni Ürün Ekle</h6>
+        </div>
+        <div class="card-body">
+            <form action="@Url.Action("Create", "Admin")" method="post" enctype="multipart/form-data">
+
+                <div class="form-group">
+                    <label>Ürün Adı</label>
+                    <input type="text" name="Ad" class="form-control" required placeholder="Örn: iPhone 15 Pro">
+                </div>
+
+                <div class="form-group">
+                    <label>Kategori</label>
+                    <select name="Kategori" class="form-control" required>
+                        <option value="">Seçiniz...</option>
+                        <option value="Bilgisayar">Bilgisayar</option>
+                        <option value="Telefon">Telefon</option>
+                        <option value="Switch">Switch</option>
+                        <option value="Router">Router</option>
+                    </select>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group col-md-6">
+                        <label>Fiyat (TL)</label>
+                        <input type="number" name="Fiyat" class="form-control" required placeholder="Örn: 50000">
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label>Rozet (Opsiyonel)</label>
+                        <input type="text" name="Rozet" class="form-control" placeholder="Örn: Yeni, İndirim">
+                    </div>
+                </div>
+
+                <!-- RESİM YÜKLEME ALANI -->
+                <div class="form-group">
+                    <label>Ürün Resmi</label>
+                    <div class="custom-file">
+                        <input type="file" class="custom-file-input" id="customFile" name="ResimDosyasi" accept=".jpg, .jpeg, .png" required>
+                        <label class="custom-file-label" for="customFile">Dosya Seç...</label>
+                    </div>
+                    <small class="text-muted">Sadece JPG veya PNG formatı.</small>
+                </div>
+
+                <div class="form-group">
+                    <label>Açıklama</label>
+                    <textarea name="Aciklama" class="form-control" rows="3" placeholder="Ürün hakkında bilgiler..."></textarea>
+                </div>
+
+                <!-- === YENİ EKLENEN BLOK: DİNAMİK TEKNİK ÖZELLİKLER === -->
+                <div class="form-group mt-4 p-3 bg-light rounded border">
+                    <label class="font-weight-bold text-primary">Teknik Özellikler Listesi</label>
+                    <small class="d-block text-muted mb-3">Ürünün teknik detaylarını madde madde giriniz.</small>
+
+                    <div id="ozellikler-kutusu">
+                        <!-- İlk satır varsayılan olarak gelsin -->
+                        <div class="form-row mb-2">
+                            <div class="col-5">
+                                <input type="text" name="OzellikAdlari" class="form-control font-weight-bold" placeholder="Özellik Başlığı (Örn: RAM)" required>
+                            </div>
+                            <div class="col-6">
+                                <input type="text" name="OzellikDegerleri" class="form-control" placeholder="Değer (Örn: 16GB)" required>
+                            </div>
+                            <div class="col-1">
+                                <!-- İlk satır silinemez -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <button type="button" class="btn btn-sm btn-outline-success mt-2 font-weight-bold" onclick="yeniOzellikEkle()">
+                        <i class="fas fa-plus"></i> Yeni Satır Ekle
+                    </button>
+                </div>
+                <!-- ==================================================== -->
+
+                <hr>
+                <button type="submit" class="btn btn-success btn-lg btn-block">Kaydet</button>
+                <a href="@Url.Action("Index", "Admin")" class="btn btn-secondary btn-block">İptal</a>
+
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- SCRIPTS -->
+<script>
+    // 1. Dosya adı gösteren script
+    document.querySelector('.custom-file-input').addEventListener('change', function (e) {
+        var fileName = document.getElementById("customFile").files[0].name;
+        var nextSibling = e.target.nextElementSibling;
+        nextSibling.innerText = fileName;
+    });
+
+    // 2. Yeni Özellik Satırı Ekleme Scripti
+    function yeniOzellikEkle() {
+        var html = `
+            <div class="form-row mb-2">
+                <div class="col-5">
+                    <input type="text" name="OzellikAdlari" class="form-control font-weight-bold" placeholder="Başlık">
+                </div>
+                <div class="col-6">
+                    <input type="text" name="OzellikDegerleri" class="form-control" placeholder="Değer">
+                </div>
+                <div class="col-1">
+                    <button type="button" class="btn btn-danger btn-circle btn-sm" onclick="this.parentElement.parentElement.remove()">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </div>
+            </div>`;
+        document.getElementById('ozellikler-kutusu').insertAdjacentHTML('beforeend', html);
+    }
+</script>

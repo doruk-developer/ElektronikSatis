@@ -1,0 +1,65 @@
+﻿
+@model IEnumerable<ElektronikSatisProje.Models.Urun>
+@{
+    ViewBag.Title = "Yönetim Paneli";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="text-gray-800">Ürün Yönetimi</h2>
+        <a href="@Url.Action("Create", "Admin")" class="btn btn-success shadow-sm">
+            <i class="fas fa-plus fa-sm"></i> Yeni Ürün Ekle
+        </a>
+    </div>
+
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">Kayıtlı Ürünler Listesi</h6>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-bordered table-hover" width="100%" cellspacing="0">
+                    <thead class="thead-light">
+                        <tr>
+                            <th>Resim</th>
+                            <th>Ürün Adı</th>
+                            <th>Fiyat</th>
+                            <th>Rozet</th>
+                            <th>İşlemler</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var urun in Model)
+                        {
+                            <tr>
+                                <td class="text-center" style="width: 80px;">
+                                    <img src="@urun.ResimYolu" style="width: 50px; height: 50px; object-fit: contain;">
+                                </td>
+                                <td>@urun.Ad</td>
+                                <td>@urun.Fiyat.ToString("N0") TL</td>
+                                <td><span class="badge @urun.RozetClass">@urun.Rozet</span></td>
+                                <td class="text-center" style="width: 150px;">
+                                    
+                                    <a href="@Url.Action("Edit", "Admin", new { id = urun.Id })"
+                                       class="btn btn-sm btn-primary shadow-sm"
+                                       title="Düzenle">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    
+                                    <a href="@Url.Action("Delete", "Admin", new { id = urun.Id })"
+                                       class="btn btn-sm btn-danger"
+                                       onclick="return confirm('Bu ürünü silmek istediğinize emin misiniz?');"
+                                       title="Sil">
+                                        <i class="fas fa-trash"></i>
+                                    </a>
+
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
