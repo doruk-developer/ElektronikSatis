@@ -3,7 +3,7 @@ using System.Linq;
 using System.Reflection;
 using System.Web.Mvc;
 
-namespace ElektronikSatisProje.Helpers
+namespace ElektronikSatis.Helpers
 {
     public static class ServiceCollectionExtensions
     {

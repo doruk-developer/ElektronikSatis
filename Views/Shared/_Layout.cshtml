@@ -1,12 +1,12 @@
 
 @{
     string profilResimYolu = "/Content/image/user_circle.png";
-    var bildirimler = new List<ElektronikSatisProje.Models.Mesaj>
+    var bildirimler = new List<ElektronikSatis.Models.Mesaj>
     ();
     int siparisSayisi = 0; // <--- YENİ DEĞİŞKEN
                                    if (User.Identity.IsAuthenticated)
                                    {
-                                   var tumKullanicilar=ElektronikSatisProje.Models.VeriYoneticisi.VerileriGetir();
+                                   var tumKullanicilar=ElektronikSatis.Models.VeriYoneticisi.VerileriGetir();
                                    var aktifKullanici=tumKullanicilar.FirstOrDefault(x =>
         x.KullaniciAdi == User.Identity.Name);
 
@@ -612,7 +612,7 @@
 
                                     @if (User.Identity.IsAuthenticated)
                                     {
-                                    var _tumKullanicilar = ElektronikSatisProje.Models.VeriYoneticisi.VerileriGetir();
+                                    var _tumKullanicilar = ElektronikSatis.Models.VeriYoneticisi.VerileriGetir();
                                     var _ben = _tumKullanicilar.FirstOrDefault(x => x.KullaniciAdi == User.Identity.Name);
 
                                     if (_ben != null && _ben.IsAdmin)

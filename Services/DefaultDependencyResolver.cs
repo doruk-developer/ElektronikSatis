@@ -5,7 +5,7 @@ using System.Linq;
 using System.Web;
 using System.Web.Mvc;
 
-namespace ElektronikSatisProje.Services
+namespace ElektronikSatis.Services
 {
     public class DefaultDependencyResolver : IDependencyResolver
     {

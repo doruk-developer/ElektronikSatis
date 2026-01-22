@@ -1,11 +1,11 @@
-﻿@model ElektronikSatisProje.Models.Urun
+﻿@model ElektronikSatis.Models.Urun
 
 @{
     ViewBag.Title = Model.Ad;
     Layout = "~/Views/Shared/_Layout.cshtml";
 
     // Controller'dan gelen benzer ürünleri alalım
-    var benzerUrunler = ViewBag.BenzerUrunler as List<ElektronikSatisProje.Models.Urun>;
+    var benzerUrunler = ViewBag.BenzerUrunler as List<ElektronikSatis.Models.Urun>;
 }
 
 <!-- ÜST KISIM: ÜRÜN VİTRİNİ -->

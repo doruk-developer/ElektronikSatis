@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace ElektronikSatisProje.Models
+namespace ElektronikSatis.Models
 {
     // Burası static OLMAMALI. Bu bir kalıptır.
     public class Urun

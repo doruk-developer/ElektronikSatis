@@ -1,11 +1,11 @@
-using ElektronikSatisProje.Helpers;
-using ElektronikSatisProje.Interfaces;
-using ElektronikSatisProje.Services;
+using ElektronikSatis.Helpers;
+using ElektronikSatis.Interfaces;
+using ElektronikSatis.Services;
 using Microsoft.Extensions.DependencyInjection;
 using System.Web.Mvc;
 using System.Web.Routing;
 
-namespace ElektronikSatisProje
+namespace ElektronikSatis
 {
     public class MvcApplication : System.Web.HttpApplication
     {

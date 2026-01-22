@@ -4,7 +4,7 @@ using System.IO;
 using System.Web;
 // VEYA System.Web.Script.Serialization kullanabilirsin (önceki gibi)
 
-namespace ElektronikSatisProje.Models
+namespace ElektronikSatis.Models
 {
     public static class UrunDeposu
     {

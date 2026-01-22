@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 
-namespace ElektronikSatisProje.Helpers
+namespace ElektronikSatis.Helpers
 {
     public class Common
     {

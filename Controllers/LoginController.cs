@@ -1,12 +1,12 @@
-﻿using ElektronikSatisProje.Interfaces;
-using ElektronikSatisProje.Models.DTO.Login;
+﻿using ElektronikSatis.Interfaces;
+using ElektronikSatis.Models.DTO.Login;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web.Mvc;
 using System.Web.Security;
 
-namespace ElektronikSatisProje.Controllers
+namespace ElektronikSatis.Controllers
 {
     public class LoginController : Controller
     {

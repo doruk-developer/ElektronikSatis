@@ -1,5 +1,5 @@
 ﻿
-@model ElektronikSatisProje.Models.Profil
+@model ElektronikSatis.Models.Profil
 
 @{
     ViewBag.Title = "Profilim";
@@ -153,7 +153,7 @@
 
                     <!-- 3. SEKME İÇERİĞİ: FAVORİLER (ID: favorites) -->
                     <div class="tab-pane fade" id="favorites" role="tabpanel">
-                        @{ var favList = ViewBag.Favoriler as List<ElektronikSatisProje.Models.Urun>; }
+                        @{ var favList = ViewBag.Favoriler as List<ElektronikSatis.Models.Urun>; }
                         @if (favList != null && favList.Count > 0)
                         {
                             <div class="row">

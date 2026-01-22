@@ -3,7 +3,7 @@ using System.IO;
 using System.Web;
 using System.Web.Script.Serialization;
 
-namespace ElektronikSatisProje.Models
+namespace ElektronikSatis.Models
 {
     // 1. KULLANICI VERİSİ MODELİ (Artık dışarıda ve herkes erişebilir)
     // 1. KULLANICI VERİSİ MODELİ

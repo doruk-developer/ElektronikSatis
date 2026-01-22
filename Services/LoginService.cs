@@ -1,10 +1,10 @@
-﻿using ElektronikSatisProje.Interfaces;
-using ElektronikSatisProje.Models.DTO.Login;
+﻿using ElektronikSatis.Interfaces;
+using ElektronikSatis.Models.DTO.Login;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace ElektronikSatisProje.Services
+namespace ElektronikSatis.Services
 {
     public class LoginService : ILoginService
     {

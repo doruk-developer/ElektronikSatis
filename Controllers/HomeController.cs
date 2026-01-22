@@ -1,10 +1,10 @@
-﻿using ElektronikSatisProje.Models;
+﻿using ElektronikSatis.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web.Mvc;
 
-namespace ElektronikSatisProje.Controllers
+namespace ElektronikSatis.Controllers
 {
     public class HomeController : Controller
     {
@@ -199,7 +199,7 @@ namespace ElektronikSatisProje.Controllers
             // 2. Eğer arama kutusu boşsa veya null ise boş liste döndür
             if (string.IsNullOrEmpty(q))
             {
-                return View(new List<ElektronikSatisProje.Models.Urun>());
+                return View(new List<ElektronikSatis.Models.Urun>());
             }
 
             // 3. Filtreleme Yap (Büyük/Küçük harf duyarlılığını kaldırmak için ToLower kullanıyoruz)
@@ -223,7 +223,7 @@ namespace ElektronikSatisProje.Controllers
         public ActionResult UrunDetay(int id)
         {
             // 1. Tüm ürünleri çek
-            var tumUrunler = ElektronikSatisProje.Models.UrunDeposu.UrunleriGetir();
+            var tumUrunler = ElektronikSatis.Models.UrunDeposu.UrunleriGetir();
 
             // 2. Seçilen ürünü bul
             var secilenUrun = tumUrunler.FirstOrDefault(x => x.Id == id);
@@ -346,7 +346,7 @@ namespace ElektronikSatisProje.Controllers
         public JsonResult CanliArama(string term)
         {
             // 1. Tüm ürünleri depodan çek
-            var tumUrunler = ElektronikSatisProje.Models.UrunDeposu.UrunleriGetir();
+            var tumUrunler = ElektronikSatis.Models.UrunDeposu.UrunleriGetir();
 
             // 2. Arama terimine göre filtrele (Büyük/Küçük harf duyarsız)
             var sonuclar = tumUrunler.Where(x => x.Ad.ToLower().Contains(term.ToLower())).ToList();

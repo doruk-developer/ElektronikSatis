@@ -1,8 +1,8 @@
-﻿using ElektronikSatisProje.Models; // Modelleri tanıması için
+﻿using ElektronikSatis.Models; // Modelleri tanıması için
 using System.Linq;
 using System.Web.Mvc;
 
-namespace ElektronikSatisProje.Controllers
+namespace ElektronikSatis.Controllers
 {
     public class AdminController : Controller
     {

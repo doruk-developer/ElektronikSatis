@@ -1,6 +1,6 @@
-﻿using ElektronikSatisProje.Models.DTO.Login;
+﻿using ElektronikSatis.Models.DTO.Login;
 
-namespace ElektronikSatisProje.Interfaces
+namespace ElektronikSatis.Interfaces
 {
     public interface ILoginService
     {

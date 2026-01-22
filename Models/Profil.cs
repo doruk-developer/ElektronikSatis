@@ -1,4 +1,4 @@
-﻿namespace ElektronikSatisProje.Models
+﻿namespace ElektronikSatis.Models
 {
     public class Profil
     {

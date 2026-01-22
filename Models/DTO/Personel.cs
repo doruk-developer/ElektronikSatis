@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 
-namespace ElektronikSatisProje.Models.DTO
+namespace ElektronikSatis.Models.DTO
 {
     public class Personel
     {

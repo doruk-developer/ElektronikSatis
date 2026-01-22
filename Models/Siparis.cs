@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace ElektronikSatisProje.Models
+namespace ElektronikSatis.Models
 {
     // Siparişin genel yapısı
     public class Siparis
