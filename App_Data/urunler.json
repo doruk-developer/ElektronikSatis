@@ -11,7 +11,7 @@
     "TeknikOzellikler": {
       "İşlemci": "Intel i5",
       "RAM": "8GB",
-      "SSD": "512GB"
+      "SSD": "1024GB"
     },
     "Kampanya": null
   },
@@ -171,6 +171,24 @@
       "RAM": "64 GB DDR5",
       "Depolama": "2 TB NVMe SSD",
       "Ekran": "17 inç QHD+ 240Hz"
+    },
+    "Kampanya": null
+  },
+  {
+    "Id": 12,
+    "Ad": "MONSTER ALEYNA T7",
+    "Fiyat": 50000.0,
+    "ResimYolu": "/Content/image/laptop5.jpg",
+    "Kategori": "Bilgisayar",
+    "Rozet": "Oyun Canavarı!",
+    "RozetClass": "badge-primary",
+    "Aciklama": "\"MONSTER ALEYNA T7, en ağır oyunları bile yüksek kare hızlarında (FPS) oynamanız için tasarlandı. RTX 3050 gücü ve 144Hz ekranı ile rekabetçi oyunlarda bir adım öndesiniz. Yüksek performanslı soğutma sistemi sayesinde uzun oyun seanslarında bile ısınma sorunu yaşatmaz.\"",
+    "TeknikOzellikler": {
+      "İşlemci": "Intel Core i7-12700H (14 Çekirdek)",
+      "Ekran Kartı": "NVIDIA GeForce RTX 3050 (4GB)",
+      "RAM": "32 GB (2x16GB) DDR4",
+      "Depolama": "1 TB NVMe Gen4 SSD",
+      "Ekran": "Ekran"
     },
     "Kampanya": null
   }
